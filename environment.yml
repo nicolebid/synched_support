@@ -1,16 +1,18 @@
-name: 'synched_support'
+name: 'synched-support'
 channels:
     - conda-forge
     - defaults
 dependencies:
     - ipykernel
+    - notebook
     - pyarrow
-    - altair-all
+    - altair
     - dash
     - dash-bootstrap-components
     - plotly
     - pip
     - urllib3
     - matplotlib
+    - pandas
     - pip:
         - dash-vega-components
