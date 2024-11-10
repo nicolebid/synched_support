@@ -1,0 +1,16 @@
+name: 'synched_support'
+channels:
+    - conda-forge
+    - defaults
+dependencies:
+    - ipykernel
+    - pyarrow
+    - altair-all
+    - dash
+    - dash-bootstrap-components
+    - plotly
+    - pip
+    - urllib3
+    - matplotlib
+    - pip:
+        - dash-vega-components
