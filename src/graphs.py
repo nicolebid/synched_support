@@ -68,7 +68,7 @@ def attendance_barchart(selected_student=None):
     fig.update_layout(
         barmode='stack', 
         title=None,
-        xaxis_title=None,
+        xaxis_title='Occurences',
         yaxis_title=None,  
         template="plotly_white",  
         xaxis=dict(
@@ -76,17 +76,18 @@ def attendance_barchart(selected_student=None):
             ticktext=[str(i) for i in tick_values],
             tickangle=0
         ),
-        height=250,
-        width=500, 
+        autosize=True, 
+        height=160,
         legend=dict(
             orientation='h', 
             yanchor='top', 
-            y=-0.5, 
+            y=-0.8, 
             xanchor='left',
-            x=-0.02,
+            x=-0.2,
             itemwidth=30,
             tracegroupgap=0
+        ), 
+        margin=dict(l=0, r=5, t=10, b=30)
         )
-    )
 
     return fig 
