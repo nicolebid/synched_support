@@ -3,11 +3,9 @@ from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
 from .data import student_list, student_schedule
-from .graphs import attendance_barchart 
+from .graphs import attendance_barchart, workhabit_timeline
 
 from dash import callback_context
-
-
 
 # Default Values
 default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
@@ -18,7 +16,8 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
                     {'Block': '2-2', 'Course': None, 'Teacher': None},
                     {'Block': '2-3', 'Course': None, 'Teacher': None},
                     {'Block': '2-4', 'Course': None, 'Teacher': None}]
-initial_chart = attendance_barchart()  
+initial_attendance_graph = attendance_barchart()  
+initial_workhabit_graph = workhabit_timeline()
 
 # MAIN CONTENT LAYOUT
 def register_callbacks(app):
@@ -60,7 +59,7 @@ def register_callbacks(app):
                         html.H4("Student Attendance"),
                         dcc.Graph(
                             id={'type': 'dynamic-output', 'index': 'attendance-graph'},
-                            figure=initial_chart,
+                            figure=initial_attendance_graph,
                             config={'displayModeBar': False} 
                         )
                     ])
@@ -69,7 +68,15 @@ def register_callbacks(app):
 
                 html.Div([
                     html.H3('Column 2'),
-                    html.Div(id={'type': 'dynamic-output', 'index': 'output-text'})
+                    html.Div(id={'type': 'dynamic-output', 'index': 'output-text'}), 
+                    html.Div([
+                        html.H4("Student Work Habit Timeline"),
+                        dcc.Graph(
+                            id={'type': 'dynamic-output', 'index': 'workhabit-graph'},
+                            figure=initial_workhabit_graph,
+                            config={'displayModeBar': False} 
+                        )
+                    ])
                 ], style={'width': '65%', 'display': 'inline-block', 'padding': '10px'})
             ], style={'display': 'flex', 'justify-content': 'space-between'})
 
@@ -103,7 +110,7 @@ def register_callbacks(app):
             return default_schedule 
         return student_schedule(selected_student)
 
-    # Update the attendance graph upon student selection
+    # Update the attendance graph when submit button is clicked
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'attendance-graph'}, 'figure'), 
         [Input({'type': 'dynamic-input', 'index': 'submit-student'}, 'n_clicks')],  
@@ -113,3 +120,15 @@ def register_callbacks(app):
         if n_clicks == 0 or not selected_student:
             return attendance_barchart() 
         return attendance_barchart(selected_student)
+    
+    # Update the work habit graph when submit botton is clicked
+    @app.callback(
+        Output({'type': 'dynamic-output', 'index': 'workhabit-graph'}, 'figure'), 
+        [Input({'type': 'dynamic-input', 'index': 'submit-student'}, 'n_clicks')],  
+        [State({'type': 'dynamic-input', 'index': 'student-select'}, 'value')]  
+    )
+    def update_workhabit_timeline(n_clicks, selected_student):
+        if n_clicks == 0 or not selected_student:
+            return workhabit_timeline() 
+        return workhabit_timeline(selected_student)
+    
