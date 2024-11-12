@@ -165,7 +165,7 @@ def workhabit_timeline(selected_student=None):
                 # Add an annotation with hover text
             fig.add_annotation(
                 x=nan_date,
-                y=len(habit_categories) - 0.5,  # Position the annotation above the plot
+                y=len(habit_categories) - 0.5,  
                 text="Absent",
                 showarrow=True,
                 ax=0,  
@@ -175,4 +175,53 @@ def workhabit_timeline(selected_student=None):
                 arrowcolor="red",
                 opacity=0.7
             )
+    return fig 
+
+def timespent_barchart(selected_student=None):
+    """Fuction to generate a bar chart for the selected student's time spent.
+    
+    Parameter
+    ---------
+    selected_student : str
+        User selected student from dropdown to generate the graph for.
+    
+    Returns
+    -------
+    fig : plotly obj 
+        Plotly figure of the student's time spent.
+    """
+    df = pd.read_csv(ATTEND_SUPPORT_DATA)
+    df_student = df[df['Student'] == selected_student]
+    subjects = df_student['Work']
+    all_subjects = ["Art", "English", "French", "Math", "Science", "Socials", "Other"]
+    counts = subjects.value_counts()    
+    all_counts = pd.Series(subjects).value_counts().reindex(all_subjects, fill_value=0)
+    subject_proportion = (all_counts/counts.sum())
+
+    colors = ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692"]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=all_subjects, 
+        y=subject_proportion, 
+        marker_color=colors, 
+        hovertemplate=(
+        "<b>%{x}</b><br>"                 
+        "Count: %{customdata}<br>"     
+        "Percentage: %{y:.0%}<br>"       
+        "<extra></extra>"                
+    ),
+    customdata=all_counts.values
+    ))
+    fig.update_layout(
+        title=None, 
+        xaxis_title='Subject Worked On',
+        template='plotly_white', 
+        margin=dict(l=5, r=5, t=10, b=35), 
+    )
+    fig.update_yaxes(tickformat=".0%", 
+                     title="Percentage of Time Spent",
+                     range=[0,1], 
+                     dtick=0.25) 
     return fig 

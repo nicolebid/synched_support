@@ -3,7 +3,7 @@ from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
 from .data import student_list, student_schedule
-from .graphs import attendance_barchart, workhabit_timeline
+from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 
 from dash import callback_context
 
@@ -18,6 +18,7 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
                     {'Block': '2-4', 'Course': None, 'Teacher': None}]
 initial_attendance_graph = attendance_barchart()  
 initial_workhabit_graph = workhabit_timeline()
+initial_timespent_graph = timespent_barchart()
 
 # MAIN CONTENT LAYOUT
 def register_callbacks(app):
@@ -30,14 +31,15 @@ def register_callbacks(app):
         if tab == 'student-tab':
             return html.Div([
                 html.Div([
+                    # Tab 1 - Column 1
                     html.H3('Column 1'),
 
                     # Student Selection
                     html.Label('Select Student'),
                     dcc.Dropdown(
                         id={'type': 'dynamic-input', 'index': 'student-select'},
-                        options=student_list(), # students names from dataset 
-                        value='A'  # Default value
+                        options=student_list(), 
+                        value='A' 
                     ),
                     html.Button('Submit', id={'type': 'dynamic-input', 'index': 'submit-student'}, n_clicks=0),
                     
@@ -63,28 +65,37 @@ def register_callbacks(app):
                             config={'displayModeBar': False} 
                         )
                     ])
+                ], style={'flex': '1', 'padding': '10px'}),  
 
-                ], style={'width': '25%', 'display': 'inline-block', 'padding': '10px'}),
-
+                # Tab 1 - Column 2
                 html.Div([
                     html.H3('Column 2'),
-                    html.Div(id={'type': 'dynamic-output', 'index': 'output-text'}), 
+                    html.Div(id={'type': 'dynamic-output', 'index': 'output-text'}),   
                     html.Div([
-                        html.H4("Student Work Habit Timeline"),
+                        dcc.RadioItems(
+                            id={'type': 'dynamic-input', 'index': 'graph-toggle'},
+                            options=[
+                                {'label': 'Work Habit Timeline', 'value': 'timeline'},
+                                {'label': 'Time Spent Bar Chart', 'value': 'barchart'}
+                            ],
+                            value='timeline', 
+                            labelStyle={'display':'inline-block'}
+                        ),
                         dcc.Graph(
-                            id={'type': 'dynamic-output', 'index': 'workhabit-graph'},
-                            figure=initial_workhabit_graph,
-                            config={'displayModeBar': False} 
+                            id={'type': 'dynamic-output', 'index': 'graph-output'},
+                            config={'displayModeBar':False}
                         )
-                    ])
-                ], style={'width': '65%', 'display': 'inline-block', 'padding': '10px'})
-            ], style={'display': 'flex', 'justify-content': 'space-between'})
+                    ], style={'padding':'10px'}
+                    ),                    
+                ], style={'flex': '2', 'padding': '10px'})  
+                
+            ], style={'display': 'flex', 'justify-content': 'space-between'}) 
 
         elif tab == 'teacher-tab':
             return html.Div([
                 html.H3('Teacher View Content'),
                 html.P('This is the content specifically for the Teacher View. Add your components here.')
-            ])
+            ]) 
 
     # COMPONENT UPDATES 
     # Update the output when the submit button is clicked
@@ -120,15 +131,24 @@ def register_callbacks(app):
         if n_clicks == 0 or not selected_student:
             return attendance_barchart() 
         return attendance_barchart(selected_student)
-    
-    # Update the work habit graph when submit botton is clicked
+        
+    # Update the timeline/barchart graphs 
     @app.callback(
-        Output({'type': 'dynamic-output', 'index': 'workhabit-graph'}, 'figure'), 
-        [Input({'type': 'dynamic-input', 'index': 'submit-student'}, 'n_clicks')],  
-        [State({'type': 'dynamic-input', 'index': 'student-select'}, 'value')]  
+        Output({'type': 'dynamic-output', 'index': 'graph-output'}, 'figure'),
+        [Input({'type': 'dynamic-input', 'index': 'graph-toggle'}, 'value'),
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value'),
+        Input({'type': 'dynamic-input', 'index': 'submit-student'}, 'n_clicks')]  
     )
-    def update_workhabit_timeline(n_clicks, selected_student):
+    def update_graph(selected_graph, selected_student, n_clicks):
         if n_clicks == 0 or not selected_student:
-            return workhabit_timeline() 
-        return workhabit_timeline(selected_student)
-    
+            if selected_graph == 'timeline':
+                figure = workhabit_timeline()  
+            else:
+                figure = timespent_barchart()  
+        else:
+            # Update graph based on selected student
+            if selected_graph == 'timeline':
+                figure = workhabit_timeline(selected_student)
+            elif selected_graph == 'barchart':
+                figure = timespent_barchart(selected_student)
+        return figure
