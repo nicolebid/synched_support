@@ -1,0 +1,67 @@
+,Date,Student,Course,Teacher,Block,Attendance,Habit,Work
+0,2023-10-10,Alice,Support 9,Ms. Lane,2-4,P,Mostly On-task,French
+1,2023-10-08,Alice,Support 9,Ms. Lane,2-4,A,,
+2,2023-10-14,Alice,Support 9,Ms. Lane,2-4,AE,,
+3,2023-10-02,Alice,Support 9,Ms. Lane,2-4,P,On-task,Math
+4,2023-10-04,Alice,Support 9,Ms. Lane,2-4,P,On-task,English
+5,2023-10-16,Alice,Support 9,Ms. Lane,2-4,L,On-task,Science
+6,2023-10-08,Bob,Support 8,Ms. Lane,2-4,P,Mostly On-task,Science
+7,2023-10-14,Bob,Support 8,Ms. Lane,2-4,P,Mostly On-task,French
+8,2023-10-10,Bob,Support 8,Ms. Lane,2-4,P,Mostly On-task,Science
+9,2023-10-04,Bob,Support 8,Ms. Lane,2-4,P,Mostly Off-task,Socials
+10,2023-10-02,Bob,Support 8,Ms. Lane,2-4,P,Off-task,Other
+11,2023-10-16,Bob,Support 8,Ms. Lane,2-4,A,,
+12,2023-10-10,Charlie,Support 9,Ms. Lane,2-4,AE,,
+13,2023-10-02,Charlie,Support 9,Ms. Lane,2-4,P,Mostly On-task,Socials
+14,2023-10-08,Charlie,Support 9,Ms. Lane,2-4,P,Mostly On-task,Science
+15,2023-10-16,Charlie,Support 9,Ms. Lane,2-4,AE,,
+16,2023-10-04,Charlie,Support 9,Ms. Lane,2-4,AE,,
+17,2023-10-14,Charlie,Support 9,Ms. Lane,2-4,AE,,
+18,2023-10-03,David,Support 8,Ms. Lane,1-1,P,Excellent,Science
+19,2023-10-09,David,Support 8,Ms. Lane,1-1,P,Excellent,English
+20,2023-10-11,David,Support 8,Ms. Lane,1-1,P,Excellent,Other
+21,2023-10-17,David,Support 8,Ms. Lane,1-1,P,Excellent,English
+22,2023-10-07,David,Support 8,Ms. Lane,1-1,AE,On-task,English
+23,2023-10-15,David,Support 8,Ms. Lane,1-1,AE,,
+24,2023-10-01,David,Support 8,Ms. Lane,1-1,P,Excellent,English
+25,2023-10-17,Eva,Support 9,Ms Lane,1-1,L,Mostly On-task,Socials
+26,2023-10-11,Eva,Support 9,Ms Lane,1-1,P,Excellent,Socials
+27,2023-10-01,Eva,Support 9,Ms Lane,1-1,P,Mostly On-task,English
+28,2023-10-15,Eva,Support 9,Ms Lane,1-1,A,,
+29,2023-10-09,Eva,Support 9,Ms Lane,1-1,P,On-task,Socials
+30,2023-10-03,Eva,Support 9,Ms Lane,1-1,P,Mostly On-task,English
+31,2023-10-07,Eva,Support 9,Ms Lane,1-1,L,Mostly On-task,French
+32,2023-10-11,Frank,Support 8,Ms. Lane,1-1,A,,
+33,2023-10-17,Frank,Support 8,Ms. Lane,1-1,P,On-task,Math
+34,2023-10-15,Frank,Support 8,Ms. Lane,1-1,L,On-task,Art
+35,2023-10-09,Frank,Support 8,Ms. Lane,1-1,AE,,
+36,2023-10-01,Frank,Support 8,Ms. Lane,1-1,P,On-task,Science
+37,2023-10-03,Frank,Support 8,Ms. Lane,1-1,L,On-task,Socials
+38,2023-10-07,Frank,Support 8,Ms. Lane,1-1,P,On-task,French
+39,2023-10-09,Grace,Support 9,Ms. Lane,1-1,AE,,
+40,2023-10-03,Grace,Support 9,Ms. Lane,1-1,L,Mostly On-task,Socials
+41,2023-10-17,Grace,Support 9,Ms. Lane,1-1,P,Mostly On-task,Math
+42,2023-10-01,Grace,Support 9,Ms. Lane,1-1,L,Mostly On-task,Socials
+43,2023-10-11,Grace,Support 9,Ms. Lane,1-1,A,,
+44,2023-10-15,Grace,Support 9,Ms. Lane,1-1,P,Mostly On-task,Socials
+45,2023-10-07,Grace,Support 9,Ms. Lane,1-1,A,,
+46,2023-10-09,Henry,Support 8,Ms. Lane,1-1,P,Mostly On-task,Socials
+47,2023-10-03,Henry,Support 8,Ms. Lane,1-1,P,Mostly On-task,Socials
+48,2023-10-01,Henry,Support 8,Ms. Lane,1-1,A,,
+49,2023-10-11,Henry,Support 8,Ms. Lane,1-1,P,On-task,Socials
+50,2023-10-07,Henry,Support 8,Ms. Lane,1-1,P,Excellent,Math
+51,2023-10-17,Henry,Support 8,Ms. Lane,1-1,P,On-task,Socials
+52,2023-10-15,Henry,Support 8,Ms. Lane,1-1,P,Mostly On-task,Math
+53,2023-10-15,Isla,Support 9,Ms. Lane,1-1,P,Excellent,Art
+54,2023-10-01,Isla,Support 9,Ms. Lane,1-1,L,Excellent,French
+55,2023-10-03,Isla,Support 9,Ms. Lane,1-1,P,Excellent,French
+56,2023-10-11,Isla,Support 9,Ms. Lane,1-1,P,Excellent,French
+57,2023-10-07,Isla,Support 9,Ms. Lane,1-1,P,Excellent,Art
+58,2023-10-09,Isla,Support 9,Ms. Lane,1-1,L,Excellent,Science
+59,2023-10-17,Isla,Support 9,Ms. Lane,1-1,A,,
+60,2023-10-14,Jack,Support 9,Ms. Lane,2-4,P,Mostly Off-task,English
+61,2023-10-02,Jack,Support 9,Ms. Lane,2-4,P,Off-task,Other
+62,2023-10-04,Jack,Support 9,Ms. Lane,2-4,P,On-task,Science
+63,2023-10-16,Jack,Support 9,Ms. Lane,2-4,P,Mostly Off-task,Science
+64,2023-10-08,Jack,Support 9,Ms. Lane,2-4,P,Mostly Off-task,Science
+65,2023-10-10,Jack,Support 9,Ms. Lane,2-4,P,Mostly Off-task,Science
