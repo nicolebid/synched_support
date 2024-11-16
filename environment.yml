@@ -1,4 +1,4 @@
-name: 'synched-support'
+name: 'synced-support'
 channels:
     - conda-forge
     - defaults

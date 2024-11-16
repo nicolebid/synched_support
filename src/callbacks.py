@@ -4,6 +4,7 @@ import dash.html as html
 import dash.dcc as dcc
 from .data import student_list, student_schedule
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
+import datetime
 
 from dash import callback_context
 
@@ -93,8 +94,7 @@ def register_callbacks(app):
 
         elif tab == 'teacher-tab':
             return html.Div([
-                html.H3('Teacher View Content'),
-                html.P('This is the content specifically for the Teacher View. Add your components here.')
+                html.H3('Teacher View Content')
             ]) 
 
     # COMPONENT UPDATES 
