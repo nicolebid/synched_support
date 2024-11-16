@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State
 from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
-from .data import student_list, student_schedule
+from .data import student_list, student_schedule, teacher_list, course_list, deadlines
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 import datetime
 
@@ -20,6 +20,7 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
 initial_attendance_graph = attendance_barchart()  
 initial_workhabit_graph = workhabit_timeline()
 initial_timespent_graph = timespent_barchart()
+default_deadlines = [{'Task': None, 'Course':None, 'Teacher': None, 'Block': None, 'Due': None}]
 
 # MAIN CONTENT LAYOUT
 def register_callbacks(app):
@@ -32,7 +33,7 @@ def register_callbacks(app):
         if tab == 'student-tab':
             return html.Div([
                 html.Div([
-                    # Tab 1 - Column 1
+                    # TAB 1 - COLUMN 1 
                     html.H3('Column 1'),
 
                     # Student Selection
@@ -68,7 +69,7 @@ def register_callbacks(app):
                     ])
                 ], style={'flex': '1', 'padding': '10px'}),  
 
-                # Tab 1 - Column 2
+                # TAB 1 - COLUMN 2
                 html.Div([
                     html.H3('Column 2'),
                     html.Div(id={'type': 'dynamic-output', 'index': 'output-text'}),   
@@ -94,11 +95,52 @@ def register_callbacks(app):
 
         elif tab == 'teacher-tab':
             return html.Div([
-                html.H3('Teacher View Content')
-            ]) 
+                html.Div([
+                    # TAB 2 - COLUMN 1
+                    html.Div([
+                        html.H3("Column 1"),   
+                        # Teacher/Course Selection
+                        dcc.Dropdown(
+                            id={'type': 'dynamic-input', 'index': 'select-type'},
+                            options=[
+                                {'label': 'Teacher', 'value': 'Teacher'},
+                                {'label': 'Course', 'value': 'Course'}
+                            ],
+                            placeholder='Select by...'
+                        ),
+                        dcc.Dropdown(
+                            id={'type': 'dynamic-input', 'index': 'select-item'}, 
+                            placeholder='Select item'
+                        ),
+                        # Upcoming Deadlines
+                        html.Div([
+                        html.H4("Upcoming Deadlines"),
+                        dash_table.DataTable(
+                            id={'type': 'dynamic-output', 'index': 'deadlines-table'},
+                            columns=[
+                                {'name': 'Task', 'id': 'Task'},
+                                {'name': 'Course', 'id': 'Course'},
+                                {'name': 'Block', 'id': 'Block'},
+                                {'name': 'Teacher', 'id': 'Teacher'},
+                                {'name': 'Due', 'id': 'Due'}      
+                            ],
+                            data=default_deadlines
+                        )
+                    ])
 
-    # COMPONENT UPDATES 
-    # Update the output when the submit button is clicked
+
+                    ], style={'width': '25%', 'display': 'inline-block', 'padding-right':'20px'} ),
+                    
+                    # TAB 2 - COLUMN 2
+                    html.Div([
+                            html.H3("Column 2"),  
+
+                    ], style={'width': '50%', 'display': 'inline-block', 'padding-left':'20px'}),
+                ])  
+            ])
+
+    # TAB 1 - UPDATES 
+    # Update student selected when the submit button is clicked
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'output-text'}, 'children'),
         [Input({'type': 'dynamic-input', 'index': 'submit-student'}, 'n_clicks')], 
@@ -152,3 +194,52 @@ def register_callbacks(app):
             elif selected_graph == 'barchart':
                 figure = timespent_barchart(selected_student)
         return figure
+    
+    # TAB 2 - UPDATES
+    # Update 2nd Dropdown when first dropdown is selected
+    @app.callback(
+        Output({'type': 'dynamic-input', 'index': 'select-item'}, 'options'),
+        Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')
+    )
+    def update_dropdown(selected_type=None):
+        # Print statements for debugging
+        print(f'selected type: {selected_type}')
+        if selected_type == 'Teacher':
+            options = teacher_list()
+        elif selected_type == 'Course':
+            options = course_list()
+        else:
+            options = []
+        return options
+    
+    # Update the deadlines table when second dropdown is selected
+    @app.callback(
+        Output({'type': 'dynamic-output', 'index': 'deadlines-table'}, 'data'), 
+        Output({'type': 'dynamic-output', 'index': 'deadlines-table'}, 'columns'),
+        [Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value'), 
+        Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')]
+    )
+    def update_deadlines(selected_item, selected_type):
+        if selected_type == 'Teacher' and selected_item is not None:
+            columns = [{'name': 'Course', 'id': 'Course'},
+                    {'name': 'Task', 'id': 'Task'}, 
+                    {'name': 'Block', 'id': 'Block'}, 
+                    {'name': 'Due', 'id': 'Due'}]
+            data = deadlines(teacher_name=selected_item)
+        elif selected_type == 'Course' and selected_item is not None: 
+            columns = [{'name': 'Teacher', 'id': 'Teacher'}, 
+                    {'name': 'Task', 'id': 'Task'},
+                    {'name': 'Block', 'id': 'Block'}, 
+                    {'name': 'Due', 'id': 'Due'}]
+            data = deadlines(course_name=selected_item)
+        else:
+            columns = [{'name': 'Task', 'id': 'Task'},
+                    {'name': 'Course', 'id': 'Course'},
+                    {'name': 'Teacher', 'id': 'Teacher'},
+                    {'name': 'Block', 'id': 'Block'},
+                    {'name': 'Due', 'id': 'Due'}]
+            data = default_deadlines
+        
+        return data, columns
+
+
