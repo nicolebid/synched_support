@@ -124,7 +124,9 @@ def register_callbacks(app):
                                 {'name': 'Teacher', 'id': 'Teacher'},
                                 {'name': 'Due', 'id': 'Due'}      
                             ],
-                            data=default_deadlines
+                            data=default_deadlines, 
+                            row_selectable = 'multi', 
+                            selected_rows = []
                         )
                     ])
 
@@ -202,8 +204,6 @@ def register_callbacks(app):
         Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')
     )
     def update_dropdown(selected_type=None):
-        # Print statements for debugging
-        print(f'selected type: {selected_type}')
         if selected_type == 'Teacher':
             options = teacher_list()
         elif selected_type == 'Course':
