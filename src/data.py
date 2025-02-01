@@ -1,5 +1,7 @@
 import pandas as pd
+import datetime
 from .config import STUDENT_DATA, DEADLINES_DATA
+
 
 # TAB 1 - DATA 
 def student_list():
@@ -31,6 +33,7 @@ def student_schedule(student_name):
     df = pd.read_csv(STUDENT_DATA)
     df_student = df[df['Student'] == student_name]
     schedule = df_student[['Block', 'Course', 'Teacher' ]]
+    schedule = schedule.sort_values(by='Block')
     return schedule.to_dict('records')
 
 # TAB 2 - DATA
@@ -44,6 +47,7 @@ def teacher_list():
             teacher in the dataset, to be used as the dropdown options.
     """
     df = pd.read_csv(STUDENT_DATA)
+    df = df[~df['Course'].str.contains('Support', regex=True)]
     teachers = df['Teacher'].unique()
     options = [{'label': name, 'value': name} for name in teachers]
     return options 
@@ -58,10 +62,31 @@ def course_list():
             course in the dataset, to be used as the dropdown options.
     """
     df = pd.read_csv(STUDENT_DATA)
+    df = df[~df['Course'].str.contains('Support', regex=True)]
     courses = df['Course'].unique()
     options = [{'label': name, 'value': name} for name in courses]
     return options 
 
+def upcoming_deadlines():
+    """Retrieves the tasks in the deadlines CSV file that are due within 2 weeks of the current
+    date and returns the values in a list. 
+    
+    Returns:
+    -------- 
+    list : A list of dictionaries containing tasks due.
+    """
+    df = pd.read_csv(DEADLINES_DATA)
+    df['Due'] = pd.to_datetime(df['Due'])
+
+    today = datetime.datetime.today()
+    two_weeks = today + datetime.timedelta(weeks=2)
+
+    df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= two_weeks))].copy()
+    df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%Y-%m-%d')
+
+    return df_upcoming.to_dict('records') 
+
+# FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):
     """Retrieves the deadlines (task, course, block, due date) from the deadlines.csv filtered by 
     the given course or teacher.
@@ -88,3 +113,50 @@ def deadlines(course_name=None, teacher_name=None):
         deadlines = df_teacher[['Task', 'Course', 'Block', 'Due' ]]
         deadlines = deadlines.sort_values(by='Due')
         return deadlines.to_dict('records')   
+
+
+
+
+# FUNCTION CURRENTLY NOT BEING USED 
+def master_deadlines():
+    """Retrieves the data from, deadlines.csv, to populate the deadline master table. 
+    
+    Returns
+    -------
+    list: List of data to populate the table. 
+    """
+    df_student = pd.read_csv(STUDENT_DATA)
+    df_student = df_student[~df_student['Course'].str.contains('Support', regex=True)]
+    df_deadlines = pd.read_csv(DEADLINES_DATA)
+    
+    # Table structure 
+    courses = df_deadlines['Course'].unique()
+    column_names = [{"name": course, "id": course, "presentation": "markdown"} for course in courses]
+    teacher_rows = []  
+    course_columns = {course: [] for course in courses} 
+
+    grouped = df_deadlines.groupby(['Course', 'Teacher'])
+    
+    for (course, teacher), teacher_data in grouped:
+        tasks = []
+        block = teacher_data['Block'].iloc[0] 
+        for _, row in teacher_data.iterrows():
+            task = row['Task']
+            due_date = row['Due']
+            tasks.append(f"{task} (Due: {due_date})")
+        
+        teacher_entry = f"**{teacher}** - {block}\n" + "\n".join(tasks)
+        course_columns[course].append(teacher_entry)
+
+    # Compact data
+    max_teachers_per_row = max(len(teacher_list) for teacher_list in course_columns.values())
+    for row_idx in range(max_teachers_per_row):
+        row_data = {}
+        for course, teachers in course_columns.items():
+            if row_idx < len(teachers):
+                row_data[course] = teachers[row_idx]
+            else:
+                row_data[course] = "" 
+        teacher_rows.append(row_data)
+
+    return teacher_rows, column_names
