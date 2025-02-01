@@ -2,13 +2,14 @@ from dash.dependencies import Input, Output, State
 from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
-from .data import student_list, student_schedule, teacher_list, course_list, deadlines, master_deadlines, upcoming_deadlines
+from .data import student_list, student_schedule, teacher_list, course_list, deadlines, master_deadlines, upcoming_deadlines, student_deadlines, teacher_roster
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 import datetime
 
 from dash import callback_context
 
-# Default Values
+# DEFAULT VALUES 
+# Tab 1
 default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
                     {'Block': '1-2', 'Course': None, 'Teacher': None},
                     {'Block': '1-3', 'Course': None, 'Teacher': None},
@@ -21,6 +22,12 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
 initial_attendance_graph = attendance_barchart()  
 initial_workhabit_graph = workhabit_timeline()
 initial_timespent_graph = timespent_barchart()
+
+# Tab 2
+default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
+
+
+# static components
 upcoming = upcoming_deadlines()
 
 # master table
@@ -55,7 +62,8 @@ def register_callbacks(app):
                                 {'name': 'Course', 'id': 'Course'},
                                 {'name': 'Teacher', 'id': 'Teacher'}       
                             ],
-                            data=default_schedule
+                            data=default_schedule, 
+                            style_cell={'textAlign':'left'}
                         )
                     ]), 
                     # Attendance Bar Chart 
@@ -115,29 +123,23 @@ def register_callbacks(app):
                 dash_table.DataTable(
                     id={'type': 'dynamic-output', 'index': 'deadlines-table'},
                     columns=[
-                        {'name': 'Due Dates', 'id': 'Due'}, 
+                        {'name': 'Due', 'id': 'Due'}, 
                         {'name': 'Task', 'id': 'Task'},  
                         {'name': 'Course', 'id': 'Course'}, 
                         {'name': 'Teacher', 'id': 'Teacher'},
                         {'name': 'Block', 'id': 'Block'}
                     ],
-                    data=upcoming
+                    data=upcoming, 
+                    style_cell={'textAlign':'center'}, 
                 )
             ])
-        ], style={
-            'width': '15%', 
-            'display': 'inline-block', 
-            'padding-right': '2px', 
-            'box-sizing': 'border-box'
-        }),
-
-
-                    
+        ], style={'flex': '1', 'padding': '10px'}
+        ),
+             
         # TAB 2 - COLUMN 2
         html.Div([
             html.Div(id={'type': 'dynamic-input', 'index': 'dynamic-t2-col2'})
-        ], style={'width': '48%', 'display': 'inline-block'}
-        
+        ], style={'flex': '3', 'padding': '10px'}        
         )
         
     ], style={'display': 'flex', 'gap': '10px', 'align-items': 'flex-start', 'paddingTop':'25px'}
@@ -203,28 +205,48 @@ def register_callbacks(app):
             placeholder = ""
         return options, placeholder
     
-
+    # Tab 2 - Col 2 task tables 
     @app.callback(
         Output({'type': 'dynamic-input', 'index': 'dynamic-t2-col2'}, 'children'), 
-        Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')
+        [Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value'), 
+         Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value')]
     )
-    def update_content_t2col2(role):
-        print(f'role selencted: {role}')
-        if role == 'Student':
+    def update_content_t2col2(role, name):
+
+        if role == 'Student' and name:
             return html.Div([
-                html.H3('Student Infromation Table')
+                html.H3(f'{name} - Task Table'),
+                dash_table.DataTable(
+                    id={'type':'dynamic-input', 'index':'student-task-table'}, 
+                    columns=[{'name':'Due', 'id':'Due'}, 
+                             {'name':'Task', 'id':'Task'}, 
+                             {'name':'Course', 'id':'Course'}, 
+                             {'name':'Teacher', 'id':'Teacher'}, 
+                             {'name':'Block', 'id':'Block'}], 
+                    data=student_deadlines(name),
+                    style_cell={'textAlign':'center'},
+                    editable=True
+                )
             ])
-        elif role == 'Teacher': 
+        elif role == 'Teacher' and name: 
+            teacher_roster_dict = teacher_roster(name)
+
             return html.Div([
-                html.H3('Teacher Infromation Table')
+            html.H3(f'{name} - Information Table'), 
+            dash_table.DataTable(
+                columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
+                data=[{col: '\n'.join(map(str, students)) for col, students in teacher_roster_dict.items()}],
+                style_cell={'padding': '10px', 'textAlign': 'center'},
+                style_data={'whiteSpace': 'pre-line'},
+                style_header={'fontWeight': 'bold'}
+            )
+
+
             ])
         else:
             return html.Div([
-                html.H3('Select a role')
+                html.H3('Select a Student or Teacher')
             ])
-    
- 
-
 
 
 

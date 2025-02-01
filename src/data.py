@@ -73,18 +73,53 @@ def upcoming_deadlines():
     
     Returns:
     -------- 
-    list : A list of dictionaries containing tasks due.
+    list : A list of dictionaries containing tasks due within 2 weeks. 
     """
     df = pd.read_csv(DEADLINES_DATA)
     df['Due'] = pd.to_datetime(df['Due'])
-
     today = datetime.datetime.today()
     two_weeks = today + datetime.timedelta(weeks=2)
-
     df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= two_weeks))].copy()
     df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%Y-%m-%d')
-
     return df_upcoming.to_dict('records') 
+
+def student_deadlines(student):
+    """Retrieves the tasks in the deadlines CSV file for the given student. 
+    
+    Returns:
+    -------- 
+    list : A list of dictionaries containing tasks for the student. 
+    """
+    df_deadlines = pd.read_csv(DEADLINES_DATA)
+    df_student = pd.read_csv(STUDENT_DATA)
+    df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
+    df_student_deadlines = df_merged[df_merged['Student'] == student]
+    df_return = df_student_deadlines[['Due', 'Task', 'Course', 'Teacher', 'Block']]
+    return df_return.to_dict('records')
+
+def teacher_roster(teacher):
+    """Retrieves the students in each of the teachers classes. 
+    
+    Returns:
+    -------- 
+    list : A list of dictionaries containing the courses and student lists. 
+    """
+    df_deadlines = pd.read_csv(DEADLINES_DATA)
+    df_student = pd.read_csv(STUDENT_DATA)
+    df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
+    df_teacher = df_merged[df_merged['Teacher'] == teacher].copy()
+    df_teacher['Course_block'] = df_teacher['Course'] + " (" + df_teacher['Block'] + ")"
+    df_pivot = df_teacher.pivot(columns='Course_block', values='Student')
+    df_clean_dict = {}
+    for col in df_pivot.columns:
+        df_clean_dict[col] = df_pivot[col].dropna().tolist()
+
+    return df_clean_dict
+
+
+
+
+
 
 # FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):
