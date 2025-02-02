@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State
 from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
-from .data import student_list, student_schedule, teacher_list, course_list, deadlines, master_deadlines, upcoming_deadlines, student_deadlines, teacher_roster
+from .data import student_list, student_schedule, teacher_list, course_list, deadlines, master_deadlines, upcoming_deadlines, student_deadlines, teacher_roster, teacher_tasks
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 import datetime
 
@@ -75,7 +75,7 @@ def register_callbacks(app):
                             config={'displayModeBar': False} 
                         )
                     ])
-                ], style={'flex': '1', 'padding': '10px'}),  
+                ], style={'flex': '1', 'padding': '10px', 'minWidth': '100px'}),  
 
                 # TAB 1 - COLUMN 2
                 html.Div([
@@ -95,7 +95,7 @@ def register_callbacks(app):
                         )
                     ], style={'padding':'10px'}
                     ),                    
-                ], style={'flex': '2', 'padding': '10px'})  
+                ], style={'flex': '2', 'padding': '10px', 'minWidth': '600px'})  
                 
             ], style={'display': 'flex', 'justify-content': 'space-between', 'paddingTop':'25px'}) 
 
@@ -111,7 +111,7 @@ def register_callbacks(app):
                     {'label': 'Student', 'value': 'Student'},
                     {'label': 'Teacher', 'value': 'Teacher'}
                 ],
-                placeholder='Sort by...', 
+                placeholder='Select a Student or Teacher...', 
             ),
             dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': 'select-item'}, 
@@ -230,28 +230,22 @@ def register_callbacks(app):
             ])
         elif role == 'Teacher' and name: 
             teacher_roster_dict = teacher_roster(name)
-
+            teacher_task_dict = teacher_tasks(name)
             return html.Div([
             html.H3(f'{name} - Information Table'), 
             dash_table.DataTable(
                 columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
-                data=[{col: '\n'.join(map(str, students)) for col, students in teacher_roster_dict.items()}],
+                data=[{col: '\n'.join(map(str, students)) for col, students in teacher_roster_dict.items()}, 
+                      {col: '\n'.join(map(str, students)) for col, students in teacher_task_dict.items()}],
                 style_cell={'padding': '10px', 'textAlign': 'center'},
                 style_data={'whiteSpace': 'pre-line'},
                 style_header={'fontWeight': 'bold'}
             )
-
-
             ])
         else:
             return html.Div([
                 html.H3('Select a Student or Teacher')
             ])
-
-
-
-
-
 
 
 

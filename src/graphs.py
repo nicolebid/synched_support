@@ -65,7 +65,6 @@ def attendance_barchart(selected_student=None):
             legendgroup=category
         )
     )
-
     fig.update_layout(
         barmode='stack', 
         title=None,

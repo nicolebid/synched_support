@@ -113,7 +113,26 @@ def teacher_roster(teacher):
     df_clean_dict = {}
     for col in df_pivot.columns:
         df_clean_dict[col] = df_pivot[col].dropna().tolist()
+    return df_clean_dict
 
+def teacher_tasks(teacher):
+    """Retrieves the assignments/tests for each course the given teacher teaches. 
+    
+    Returns:
+    -------- 
+    list : A list of dictionaries containing the courses as keys and a list of assignments/tests as items. 
+    """
+    df_deadlines = pd.read_csv(DEADLINES_DATA)
+    df_student = pd.read_csv(STUDENT_DATA)
+    df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
+    df_teacher = df_merged[df_merged['Teacher'] == teacher].copy()
+    df_teacher['Due_display'] = pd.to_datetime(df_teacher['Due']).dt.strftime('%b %d')  
+    df_teacher['Task_due'] = df_teacher['Task'].str.cat(df_teacher['Due_display'], sep=' - ')
+    df_teacher['Course_block'] = df_teacher['Course'] + " (" + df_teacher['Block'] + ")"
+    df_pivot = df_teacher.pivot(columns='Course_block', values='Task_due')    
+    df_clean_dict = {}
+    for col in df_pivot.columns:
+        df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
 
 
