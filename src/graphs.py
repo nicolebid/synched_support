@@ -28,7 +28,123 @@ def attendance_counts(selected_student=None):
         attendance.setdefault(key, value)
     return attendance
 
-def attendance_barchart(selected_student=None):
+def attendance_barchart(selected_student=None, overall=True):
+    """Fuction to generate bar charts for the selected student's attendance record, either one
+    single accumulated attendance bar chart or a bar chart for each course..
+    
+    Parameter
+    ---------
+    selected_student : str
+        User selected student from dropdown, to calculate the attendance count for.
+    overall: bool
+        If true, generates a single bar chart for the accumulated attendance. If False, a bar chart
+        for each course is returned. 
+    
+    Returns
+    -------
+    fig : plotly obj 
+        Plotly figure of the attendance barchart.
+    """
+
+    # Initial Chart 
+    if selected_student == None: 
+        attend_percent_t = [[0], [0], [0], [0]]
+        ordered_subjects=['']
+        attend_counts_t  = [[0], [0], [0], [0]]   
+        gap = 0    
+    else:    
+        # Import and set up data to plot 
+        attendance = pd.read_csv(ATTEND_CLASS_DATA)
+        attendance_student = attendance[attendance['Student'] == selected_student]
+            
+        student_attendance_dict = {}
+        totals = {'P': 0, 'L': 0, 'AE': 0, 'A': 0}   
+
+        # get attendance for each course
+        for course in attendance_student['Course'].unique():
+                
+            attendance_course = attendance_student[attendance_student['Course'] == course]
+            attendance_col = attendance_course['Attendance']
+            attendance_counts = attendance_col.value_counts().to_dict()
+
+            for key, value in totals.items():
+                attendance_counts.setdefault(key, value)
+                student_attendance_dict[course] = attendance_counts
+
+        ordered_subjects = sorted(student_attendance_dict.keys(), reverse=True)
+        ordered_status = ['P', 'L', 'AE', 'A']    
+
+        # SET UP FOR OVERALL CHART   
+        if overall:
+            # Totals across courses 
+            for key, value in student_attendance_dict.items():
+                for key in totals:
+                    totals[key] += value.get(key, 0) 
+                
+            attend_counts=[totals[status] for status in ordered_status]
+            attend_counts_t=[[x] for x in attend_counts]
+            attend_percent_t=[[x/sum(attend_counts)*100] for x in attend_counts]
+            ordered_subjects=['']
+
+            # bar gap
+            gap = 0.7
+        else:
+        # SET UP FOR COURSE SPECIFIC CHARTS
+            attend_counts = [[student_attendance_dict[subject][status] for status in ordered_status] for subject in ordered_subjects]
+            attend_counts_t = [list(row) for row in zip(*attend_counts)]
+            attend_percent = [[round(x/sum(lst)*100, 2) for x in lst] for lst in attend_counts]
+            attend_percent_t = [list(row) for row in zip(*attend_percent)]
+
+            # bar gap
+            gap = 0.2 
+        
+    # Plot 
+    status = ['Present', 'Late', 'Excused', 'Absent']
+    colors =['rgba(41, 118, 74, 0.8)', 'rgba(33, 42, 168, 0.8)', 
+                'rgba(239, 164, 107, 0.8)', 'rgba(194, 27, 24, 0.8)']
+        
+    # plot barcharts 
+    fig = go.Figure()
+
+    for n, xd in enumerate(attend_percent_t):
+        fig.add_trace(go.Bar(
+            y=ordered_subjects, 
+            x=xd, 
+            name=status[n],
+            orientation='h',
+            marker=dict(
+                color=colors[n],
+                line=dict( width=1)
+            ), 
+            customdata=attend_counts_t[n], 
+            hovertemplate=f'{status[n]}: %{{x:.0f}}% - %{{customdata}} time(s)<extra></extra>' 
+        )) 
+
+    fig.update_layout(
+        barmode='stack', 
+        template="plotly_white", 
+        margin=dict(l=20, r=20, t=20, b=20), 
+        xaxis=dict(
+            tickvals=[0, 20, 40, 60, 80, 100], 
+            ticktext=['0%', '20%', '40%', '60%', '80%', '100%'], 
+        ),
+        bargap=gap, 
+        height=300, 
+        autosize=True,
+        legend=dict(
+            orientation='h', 
+            yanchor='top', 
+            y=-0.2, 
+            xanchor='left',
+            x=0,
+            itemwidth=30, 
+            traceorder='normal'
+        ),
+    )
+    return fig 
+
+
+def attendance_barchart_none(selected_student=None):
     """Fuction to generate a barchart for the selected student's attendance record.
     
     Parameter

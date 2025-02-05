@@ -136,10 +136,6 @@ def teacher_tasks(teacher):
     return df_clean_dict
 
 
-
-
-
-
 # FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):
     """Retrieves the deadlines (task, course, block, due date) from the deadlines.csv filtered by 

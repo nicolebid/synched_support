@@ -3,7 +3,7 @@ from dash import dash_table
 import dash.html as html
 import dash.dcc as dcc
 from .data import student_list, student_schedule, teacher_list, course_list, deadlines, master_deadlines, upcoming_deadlines, student_deadlines, teacher_roster, teacher_tasks
-from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
+from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart, attendance_barchart_none
 import datetime
 
 from dash import callback_context
@@ -68,7 +68,18 @@ def register_callbacks(app):
                     ]), 
                     # Attendance Bar Chart 
                     html.Div([
-                        html.H4("Student Attendance"),
+                        html.Div([
+                            html.H4("Student Attendance", style={'margin-right': '50px'}),
+                            dcc.RadioItems(
+                                id={'type': 'dynamic-input', 'index': 'attendance-toggle'},
+                                options=[
+                                    {'label': 'Overall', 'value': 'overall-attend'},
+                                    {'label': 'Course Specific', 'value': 'course-attend'}
+                                ],
+                                value='overall-attend', 
+                                labelStyle={'display':'inline-block'}
+                            )
+                        ], style={'display': 'flex', 'align-items': 'center'}), 
                         dcc.Graph(
                             id={'type': 'dynamic-output', 'index': 'attendance-graph'},
                             figure=initial_attendance_graph,
@@ -157,14 +168,19 @@ def register_callbacks(app):
             return student_schedule(selected_student)
         return default_schedule
 
-    # Update the attendance graph when student is selected
+    # Update the attendance graph based on student and graph type 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'attendance-graph'}, 'figure'), 
-        [Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')]  
+        [Input({'type': 'dynamic-input', 'index': 'attendance-toggle'}, 'value'),
+         Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')]  
     )
-    def update_attendance_bar_chart(selected_student):
-        if selected_student:
-            return attendance_barchart(selected_student)
+    def update_attendance_bar_chart(selected_graph, selected_student):
+        if not selected_student:
+            return attendance_barchart()
+        if selected_graph == 'overall-attend':
+            return attendance_barchart(selected_student, True)
+        elif selected_graph == 'course-attend':
+            return attendance_barchart(selected_student, False)
         return attendance_barchart()
         
     # Update the timeline/barchart graph based on student and graph type 
