@@ -80,6 +80,7 @@ def upcoming_deadlines():
     today = datetime.datetime.today()
     two_weeks = today + datetime.timedelta(weeks=2)
     df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= two_weeks))].copy()
+    df_upcoming = df_upcoming.sort_values(by='Due')
     df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%Y-%m-%d')
     return df_upcoming.to_dict('records') 
 

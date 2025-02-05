@@ -83,7 +83,7 @@ def attendance_barchart(selected_student=None, overall=True):
                 
             attend_counts=[totals[status] for status in ordered_status]
             attend_counts_t=[[x] for x in attend_counts]
-            attend_percent_t=[[x/sum(attend_counts)*100] for x in attend_counts]
+            attend_percent_t=[[x/sum(attend_counts)*100 if sum(attend_counts) != 0 else 0] for x in attend_counts]
             ordered_subjects=['']
 
             # bar gap
@@ -92,7 +92,7 @@ def attendance_barchart(selected_student=None, overall=True):
         # SET UP FOR COURSE SPECIFIC CHARTS
             attend_counts = [[student_attendance_dict[subject][status] for status in ordered_status] for subject in ordered_subjects]
             attend_counts_t = [list(row) for row in zip(*attend_counts)]
-            attend_percent = [[round(x/sum(lst)*100, 2) for x in lst] for lst in attend_counts]
+            attend_percent = [[round(x/sum(lst)*100, 2) if sum(lst) != 0 else 0 for x in lst] for lst in attend_counts]
             attend_percent_t = [list(row) for row in zip(*attend_percent)]
 
             # bar gap
@@ -142,7 +142,6 @@ def attendance_barchart(selected_student=None, overall=True):
         ),
     )
     return fig 
-
 
 def attendance_barchart_none(selected_student=None):
     """Fuction to generate a barchart for the selected student's attendance record.

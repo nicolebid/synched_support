@@ -231,7 +231,7 @@ def register_callbacks(app):
 
         if role == 'Student' and name:
             return html.Div([
-                html.H3(f'{name} - Task Table'),
+                html.H3(f'{name} - Tasks'),
                 dash_table.DataTable(
                     id={'type':'dynamic-input', 'index':'student-task-table'}, 
                     columns=[{'name':'Due', 'id':'Due'}, 
@@ -248,7 +248,7 @@ def register_callbacks(app):
             teacher_roster_dict = teacher_roster(name)
             teacher_task_dict = teacher_tasks(name)
             return html.Div([
-            html.H3(f'{name} - Information Table'), 
+            html.H3(f'{name} - Assigned Tasks'), 
             dash_table.DataTable(
                 columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
                 data=[{col: '\n'.join(map(str, students)) for col, students in teacher_roster_dict.items()}, 
@@ -262,63 +262,3 @@ def register_callbacks(app):
             return html.Div([
                 html.H3('Select a Student or Teacher')
             ])
-
-
-
-
- # html.Div([  
-        #     html.Div([
-        #         html.H1("Course Assignments Dash Grid", style={
-        #             'text-align': 'left',  
-        #             'margin': '1',   
-        #         }),
-        #         dash_table.DataTable(
-        #             data=data,
-        #             columns=column_names,
-        #             style_table={'width': '100%', 'margin': '0','padding': '0'},
-        #             style_cell={'textAlign': 'left', 'padding': '5px'},
-        #             style_header={'fontWeight': 'bold', 'backgroundColor': '#f0f0f0', 'textAlign': 'left'},
-        #             style_data={'whiteSpace': 'pre-line','height': 'auto'}
-        #         )
-        #     ], style={'width': '100%', 'textAlign': 'left', 'margin': '0','padding': '0'}
-        #     )
-        # ], style={'width': '85%', 'box-sizing': 'border-box','textAlign': 'left', 'margin': '0', 'padding-right': '10px' }
-        # )
-
-
-
-
-
-
-
-    # Update the deadlines table when second dropdown is selected
-    # @app.callback(
-    #     Output({'type': 'dynamic-output', 'index': 'deadlines-table'}, 'data'), 
-    #     Output({'type': 'dynamic-output', 'index': 'deadlines-table'}, 'columns'),
-    #     [Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value'), 
-    #     Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')]
-    # )
-    # def update_deadlines(selected_item, selected_type):
-    #     if selected_type == 'Teacher' and selected_item is not None:
-    #         columns = [{'name': 'Course', 'id': 'Course'},
-    #                 {'name': 'Task', 'id': 'Task'}, 
-    #                 {'name': 'Block', 'id': 'Block'}, 
-    #                 {'name': 'Due', 'id': 'Due'}]
-    #         data = deadlines(teacher_name=selected_item)
-    #     elif selected_type == 'Course' and selected_item is not None: 
-    #         columns = [{'name': 'Teacher', 'id': 'Teacher'}, 
-    #                 {'name': 'Task', 'id': 'Task'},
-    #                 {'name': 'Block', 'id': 'Block'}, 
-    #                 {'name': 'Due', 'id': 'Due'}]
-    #         data = deadlines(course_name=selected_item)
-    #     else:
-    #         columns = [{'name': 'Task', 'id': 'Task'},
-    #                 {'name': 'Course', 'id': 'Course'},
-    #                 {'name': 'Teacher', 'id': 'Teacher'},
-    #                 {'name': 'Block', 'id': 'Block'},
-    #                 {'name': 'Due', 'id': 'Due'}]
-    #         data = default_deadlines
-        
-    #     return data, columns
-
-
