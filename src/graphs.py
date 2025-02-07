@@ -247,9 +247,9 @@ def workhabit_timeline(selected_student=None):
         x=attendance_filter['Date'], 
         y=attendance_filter['Habit'].cat.codes, 
         mode='lines+markers',
-        line=dict(dash='dot'),
+        line=dict(dash='dot', color='rgba(41, 118, 74, 0.8)'),
         hovertemplate="<b>Date:</b> %{x|%b-%d}<br><b>Habit:</b> %{y}<br><extra></extra>" 
-    ))
+    )), 
 
     fig.update_layout(
         yaxis=dict(
@@ -275,7 +275,7 @@ def workhabit_timeline(selected_student=None):
     if selected_student != None:
         # red line for each NaN value
         for nan_date in nan_dates:
-            fig.add_vline(x=nan_date, line=dict(color="red", width=1 ))
+            fig.add_vline(x=nan_date, line=dict(color='rgba(194, 27, 24, 0.8)', width=1 ))
                 # Add an annotation with hover text
             fig.add_annotation(
                 x=nan_date,
