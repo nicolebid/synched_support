@@ -9,7 +9,7 @@ from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 title = html.H1(
     'Synced Support',
     style={
-        'backgroundColor': '#437DC2',
+        'backgroundColor': 'rgba(33, 42, 168, 0.8)',
         'color': 'white',
         'font-size': '20px',
         'margin' : '0',
@@ -24,6 +24,23 @@ info_button = dbc.Button(
         'width': '100px',
         'background-color': 'black',
         'color': 'white'}
+)
+
+app_info = [
+    html.P(
+        "<app info>", style={'font-size': '16px'}
+    ),
+    html.Br(),
+    html.P(
+        "<app instructions>", style={'font-size': '16px'}
+    )
+]
+
+info_section = dbc.Collapse(
+    app_info,
+    id="info",
+    style ={'background-color':'white', 
+            'padding': 10}
 )
 
 # MAIN CONTENT 
@@ -54,7 +71,7 @@ default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': 
 # Student Tab 
 student_tab = html.Div([
                 html.Div([
-                    # TAB 1 - COLUMN 1 
+                    # COLUMN 1 
                     # Student Selection
                     dcc.Dropdown(
                         id={'type': 'dynamic-input', 'index': 'student-select'},
@@ -99,7 +116,7 @@ student_tab = html.Div([
                     ])
                 ], style={'flex': '1', 'padding': '10px', 'minWidth': '100px'}),  
 
-                # TAB 1 - COLUMN 2
+                # COLUMN 2
                 html.Div([
                     html.Div([
                         dcc.RadioItems(
@@ -133,12 +150,14 @@ task_tab = html.Div([
                     {'label': 'Student', 'value': 'Student'},
                     {'label': 'Teacher', 'value': 'Teacher'}
                 ],
-                placeholder='Select a Student or Teacher...', 
+                placeholder='Select a Student or Teacher...'
             ),
+            html.Br(),
             dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': 'select-item'}, 
-                placeholder='Select Item'
+                placeholder='Select Item', 
             ),
+            html.Br(),
             # Upcoming Deadlines
             html.Div([
                 html.H4("Upcoming Deadlines"),
@@ -173,14 +192,21 @@ task_tab = html.Div([
 # user input - tasks enter/remove
 
 # FOOTER
+
+footer_info = [
+    html.A('Source Code on GitHub.', href='<link>', style={'font-size': '14px', 'margin-bottom': '10px', 'color': 'white'}),
+    html.P('Last updated on <date>', style={'font-size': '12px', 'margin-bottom': '10px'}),   
+]
+
 footer =  html.H3(
-    '<enter info> ',
+    footer_info,
     style={
-        'backgroundColor': '#437DC2',
+        'backgroundColor': 'rgba(33, 42, 168, 0.8)',
         'color': 'white',
         'font-size': '15px',
         'margin' : '0',
         'align-text': 'center',
         'padding': '15px'}, 
 )
+
 
