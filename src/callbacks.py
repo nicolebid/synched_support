@@ -9,6 +9,20 @@ from dash import callback_context
 from .components import *
 
 def register_callbacks(app):
+
+    # Dropdown button for information
+    @app.callback(
+        Output({'type': 'dynamic-output', 'index':"info"}, "is_open"),
+        [Input({'type': 'dynamic-input', 'index': 'info-button'}, "n_clicks")],
+        [State({'type': 'dynamic-state', 'index':'info'}, "is_open")],  
+    )
+    def toggle_button(n, is_open):
+        print(n)  
+        print(is_open)  
+        if n:
+            return not is_open
+        return is_open
+
     
     # Active tab
     @app.callback(

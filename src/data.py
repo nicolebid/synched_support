@@ -2,7 +2,6 @@ import pandas as pd
 import datetime
 from .config import STUDENT_DATA, DEADLINES_DATA
 
-
 # TAB 1 - DATA 
 def student_list():
     """Retrieves the list of student names in the CSV file then formats them into a list
@@ -81,7 +80,7 @@ def upcoming_deadlines():
     two_weeks = today + datetime.timedelta(weeks=2)
     df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= two_weeks))].copy()
     df_upcoming = df_upcoming.sort_values(by='Due')
-    df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%Y-%m-%d')
+    df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%b %d')  
     return df_upcoming.to_dict('records') 
 
 def student_deadlines(student):
@@ -94,7 +93,8 @@ def student_deadlines(student):
     df_deadlines = pd.read_csv(DEADLINES_DATA)
     df_student = pd.read_csv(STUDENT_DATA)
     df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
-    df_student_deadlines = df_merged[df_merged['Student'] == student]
+    df_student_deadlines = df_merged[df_merged['Student'] == student].copy()
+    df_student_deadlines['Due'] = pd.to_datetime(df_student_deadlines['Due']).dt.strftime('%b %d')  
     df_return = df_student_deadlines[['Due', 'Task', 'Course', 'Teacher', 'Block']]
     return df_return.to_dict('records')
 

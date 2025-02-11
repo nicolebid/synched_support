@@ -312,14 +312,12 @@ def timespent_barchart(selected_student=None):
     all_counts = pd.Series(subjects).value_counts().reindex(all_subjects, fill_value=0)
     subject_proportion = (all_counts/counts.sum())
 
-    colors = ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692"]
-
     fig = go.Figure()
 
     fig.add_trace(go.Bar(
         x=all_subjects, 
         y=subject_proportion, 
-        marker_color=colors, 
+        marker_color='rgba(33, 42, 168, 0.8)', 
         hovertemplate=(
         "<b>%{x}</b><br>"                 
         "Count: %{customdata}<br>"     

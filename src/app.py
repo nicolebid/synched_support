@@ -9,17 +9,20 @@ from .callbacks import *
 
 
 # Initialize app 
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], title="Synced Support")
+app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY], title="Synced Support")
 server = app.server
 
 # Define layout
 app.layout = dbc.Container([
-    dbc.Row([
+    dbc.Row([ 
         dbc.Col(title), dbc.Col(html.Div(info_button), 
                                 className="text-right", 
                                 width="auto", 
-                                style={'background-color': 'transparent', 'padding-right': '24px','padding-top': '12px',                                                                                          'padding-bottom': '12px'})
-                ],style={'background-color':'#FCAE1E'}            
+                                style={'background-color': 'transparent', 
+                                       'padding-right': '24px',
+                                       'padding-top': '12px',                                                                                     
+                                        'padding-bottom': '12px'})
+                ]            
     ), 
     dbc.Row([
         html.Div([
@@ -28,10 +31,10 @@ app.layout = dbc.Container([
         ]), 
     dbc.Row([footer])
     ])
-])
-
-
-
+], 
+    fluid=True,
+    style={'margin': 0, 'padding': 0}
+)
 
 # register callbacks
 register_callbacks(app)
