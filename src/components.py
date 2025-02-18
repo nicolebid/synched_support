@@ -9,21 +9,23 @@ from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 title = html.H1(
     'Synced Support',
     style={
-        'backgroundColor': 'rgba(33, 42, 168, 0.8)',
+        'background-color': '#387c9f',
         'color': 'white',
-        'font-size': '20px',
-        'margin' : '0',
-        'padding': '15px'}
+        'font-size': '26px',
+        'margin' : '0px',
+        'padding': '20px'}
 )
 
 info_button = dbc.Button(
-    "Learn More!",
+    "About",
     id="info-button",
-    outline=False,
+    outline=True,
     style={
-        'width': '100px',
-        'background-color': 'black',
-        'color': 'white'}
+        'background-color': '#387c9f',
+        'color': 'white',
+        'border-radius': '20px',
+        'font-size': '18px',
+    }
 )
 
 app_info = [
@@ -77,11 +79,12 @@ student_tab = html.Div([
                         id={'type': 'dynamic-input', 'index': 'student-select'},
                         options=student_list(), 
                         value='A', 
-                         placeholder='Select Student...' 
+                        placeholder='Select Student...', 
+                        style={'marginBottom': '15px'} 
                     ),                    
                     # Student Schedule 
                     html.Div([
-                        html.H4("Student Schedule"),
+                        html.H5("Schedule"),
                         dash_table.DataTable(
                             id={'type': 'dynamic-output', 'index': 'course-table'},
                             columns=[
@@ -93,11 +96,17 @@ student_tab = html.Div([
                             style_cell={'textAlign':'left'}, 
                             style_header={'fontWeight': 'bold'}
                         )
-                    ]), 
+                    ], style={
+                        'border': '2px solid #387c9f',
+                        'border-radius': '8px', 
+                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                        'padding':'10px', 
+                        'marginBottom': '15px' 
+                        }), 
                     # Attendance Bar Chart 
                     html.Div([
                         html.Div([
-                            html.H4("Student Attendance", style={'margin-right': '50px'}),
+                            html.H5("Attendance", style={'margin-right': '50px'}),
                             dcc.RadioItems(
                                 id={'type': 'dynamic-input', 'index': 'attendance-toggle'},
                                 options=[
@@ -113,30 +122,39 @@ student_tab = html.Div([
                             figure=initial_attendance_graph,
                             config={'displayModeBar': False} 
                         )
-                    ])
-                ], style={'flex': '1', 'padding': '10px', 'minWidth': '100px'}),  
+                    ], style={'border': '2px solid #387c9f',
+                          'border-radius': '8px', 
+                          'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                          'padding':'10px'})
+                ], style={'flex': '1', 
+                          'padding': '10px', 
+                          'minWidth': '100px'}
+                          ),  
 
-                # COLUMN 2
+                # COLUMN 2 
                 html.Div([
                     html.Div([
+                        html.H5("Study Habits", style={'margin-right': '50px'}),
                         dcc.RadioItems(
                             id={'type': 'dynamic-input', 'index': 'graph-toggle'},
                             options=[
-                                {'label': 'Work Habit Timeline', 'value': 'timeline'},
-                                {'label': 'Time Spent Bar Chart', 'value': 'barchart'}
+                                {'label': ' Work Habit Timeline', 'value': 'timeline'},
+                                {'label': ' Time Spent Bar Chart', 'value': 'barchart'}
                             ],
                             value='timeline', 
-                            labelStyle={'display':'inline-block'}
+                            labelStyle={'display':'inline-block', 'padding': '10px'}
                         ),
                         dcc.Graph(
                             id={'type': 'dynamic-output', 'index': 'graph-output'},
                             config={'displayModeBar':False}
                         )
-                    ], style={'padding':'10px'}
+                    ], style={'padding':'10px', 'border': '2px solid #387c9f',
+                        'border-radius': '8px', 
+                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                        'padding':'10px' }
                     ),                    
-                ], style={'flex': '2', 'padding': '10px', 'minWidth': '600px'})  
-                
-            ], style={'display': 'flex', 'justify-content': 'space-between', 'paddingTop':'25px'}) 
+                ], style={'flex': '2', 'padding': '15px', 'minWidth': '600px'}),                 
+            ], style={'display': 'flex', 'justify-content': 'space-between', 'paddingTop':'10px', }) 
 
 # Task Tab 
 task_tab = html.Div([
@@ -201,12 +219,12 @@ footer_info = [
 footer =  html.H3(
     footer_info,
     style={
-        'backgroundColor': 'rgba(33, 42, 168, 0.8)',
+        'backgroundColor': '#387c9f',
         'color': 'white',
         'font-size': '15px',
         'margin' : '0',
-        'align-text': 'center',
-        'padding': '15px'}, 
+        'padding': '0px',
+        'text-align': 'center'},  
 )
 
 

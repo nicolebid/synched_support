@@ -238,7 +238,7 @@ def workhabit_timeline(selected_student=None):
     attendance_filter = attendance_filter[['Date', 'Habit']]
 
     # Ordinal Categories 
-    habit_categories = ['Off-task', 'Mostly Off-task', 'Mostly On-task', 'On-task', 'Excellent']
+    habit_categories = ['Off-task', 'Mostly Off-task', 'Equally On/Off-task',  'Mostly On-task', 'On-task']
     attendance_filter['Habit'] = pd.Categorical(attendance_filter['Habit'], categories=habit_categories, ordered=True)
 
     # plot
@@ -289,7 +289,7 @@ def workhabit_timeline(selected_student=None):
                 arrowcolor="red",
                 opacity=0.7
             )
-    return fig 
+    return fig
 
 def timespent_barchart(selected_student=None):
     """Fuction to generate a bar chart for the selected student's time spent.

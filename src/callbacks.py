@@ -23,7 +23,6 @@ def register_callbacks(app):
             return not is_open
         return is_open
 
-    
     # Active tab
     @app.callback(
         Output('tab-content', 'children'),
