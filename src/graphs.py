@@ -19,7 +19,7 @@ def attendance_counts(selected_student=None):
     if selected_student == None:
         return {'P': 0, 'L': 0, 'A': 0, 'AE': 0}  
     
-    df = pd.read_csv(ATTEND_CLASS_DATA)
+    df = pd.read_csv(ATTEND_DATA)
     df_student = df[df['Student'] == selected_student]
     student_attendance = df_student['Attendance']
     attendance = student_attendance.value_counts().to_dict()
@@ -54,7 +54,7 @@ def attendance_barchart(selected_student=None, overall=True):
         gap = 0    
     else:    
         # Import and set up data to plot 
-        attendance = pd.read_csv(ATTEND_CLASS_DATA)
+        attendance = pd.read_csv(ATTEND_DATA)
         attendance_student = attendance[attendance['Student'] == selected_student]
             
         student_attendance_dict = {}
@@ -164,7 +164,6 @@ def attendance_barchart_none(selected_student=None):
     values = [attendance[category] for category in categories]
     labels = {'P': 'Present', 'L': 'Late', 'A': 'Absent', 'AE': 'Excused'}
 
-    # ticks
     total_classes = sum(attendance.values())
     tick_values = list(range(0, total_classes+1, 2)) 
 
@@ -219,7 +218,8 @@ def workhabit_timeline(selected_student=None):
     fig : plotly obj 
         Plotly figure of the student's work habits.
     """
-    attendance_data = pd.read_csv(ATTEND_SUPPORT_DATA)
+    attendance_data = pd.read_csv(ATTEND_DATA)
+    attendance_data = attendance_data[attendance_data['Course'].str.contains('Support')]
     attendance_data['Date'] = pd.to_datetime(attendance_data['Date'])
     attendance_data = attendance_data.sort_values(by='Date')
 
@@ -304,7 +304,8 @@ def timespent_barchart(selected_student=None):
     fig : plotly obj 
         Plotly figure of the student's time spent.
     """
-    df = pd.read_csv(ATTEND_SUPPORT_DATA)
+    df = pd.read_csv(ATTEND_DATA)
+    df[df['Course'].str.contains('Support')]
     df_student = df[df['Student'] == selected_student]
     subjects = df_student['Work']
     all_subjects = ["Art", "English", "French", "Math", "Science", "Socials", "Other"]

@@ -7,8 +7,6 @@ from dash.dependencies import Input, Output
 from .components import *
 from .callbacks import * 
 
-
-
 # Initialize app 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SPACELAB], title="Synced Support")
 server = app.server
@@ -34,8 +32,11 @@ app.layout = dbc.Container([
             html.Div(id='tab-content', style={'flex': '1', 'overflow': 'auto'})
         ], style={ 'display': 'flex', 'flex-direction': 'column', 
                     'height': 'calc(100vh - 65px - 30px)',  #pg - header - footer
-                    'width': '100%', 'overflow': 'hidden'}),
-    ],  style={'flex': '1', 'width': '100%', 'margin': 0, 'padding': 0, 'overflow': 'hidden'}), 
+                    'width': '100%'
+            }
+        ),
+    ],  style={'flex': '1', 'width': '100%', 'margin': 0, 'padding': 0
+               }), 
     
     # Footer
     dbc.Row([footer], 
@@ -49,9 +50,9 @@ app.layout = dbc.Container([
                     'align-text': 'center',
                     'margin': 0  }), 
     ], 
-
     fluid=True,   
-    style={'display': 'flex', 'flex-direction': 'column', 'height': '100vh', 'margin': 0, 'padding': 0, 'overflow': 'hidden'})
+    style={'display': 'flex', 'flex-direction': 'column', 'height': '100vh', 'margin': 0, 'padding': 0
+           })
 
 # register callbacks
 register_callbacks(app)

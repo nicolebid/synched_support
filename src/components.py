@@ -1,7 +1,10 @@
 import dash.html as html
 import dash.dcc as dcc
-from dash import dash_table
 import dash_bootstrap_components as dbc
+import datetime
+import pandas as pd 
+from collections import OrderedDict
+from dash import dash_table
 from .data import  student_list, upcoming_deadlines
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 
@@ -66,13 +69,20 @@ initial_attendance_graph = attendance_barchart()
 initial_workhabit_graph = workhabit_timeline()
 initial_timespent_graph = timespent_barchart()
 
+# User input options
+workhabit_options = OrderedDict([
+    ('Student', ['Alice', 'Bob', 'Charlie']),
+    ('Workhabit Score', [0, 1, 2, 3]),
+    ('Worked On', ['Art', 'English', 'French', 'Math', 'Science', 'Socials', 'Other']), 
+    ('Support Attendance', ['P', 'L', 'AE','A'])
+])
+
 # Default values - task tab 
 default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
 
-
 # Student Tab 
-student_tab = html.Div([
-                html.Div([
+student_tab = dbc.Row([
+                dbc.Col([
                     # COLUMN 1 
                     # Student Selection
                     dcc.Dropdown(
@@ -80,8 +90,50 @@ student_tab = html.Div([
                         options=student_list(), 
                         value='A', 
                         placeholder='Select Student...', 
-                        style={'marginBottom': '15px'} 
+                        style={'marginBottom': '30px'} 
                     ),                    
+                    # User Input - Student Workhabits
+                    html.Div([
+                        html.H3("Enter Daily Workhabits", style={'marginBottom':'10px'}),
+
+                        # Date 
+                        html.Label("Date", style={'marginRight': '15px'}),
+                        dcc.DatePickerSingle(id="date-picker", placeholder="Select date", date=datetime.date.today(), style={'marginBottom':'10px'}),
+                        
+                        # input table
+                        dash_table.DataTable(
+                            id={'type': 'user-input', 'index': 'workhabit-table'},
+                            data=[{'Student': "", 'Workhabit Score': "", 'Worked On': "", 'Support Attendance':""}], 
+                            columns=[
+                                {'id': 'Student', 'name': 'Student', 'presentation': 'dropdown'},
+                                {'id': 'Workhabit Score', 'name': 'Workhabit Score', 'presentation':'dropdown'},
+                                {'id': 'Worked On', 'name': 'Worked On', 'presentation': 'dropdown'},
+                                {'id': 'Support Attendance', 'name': 'Support Attendance', 'presentation': 'dropdown'}
+                            ],
+                            editable=True,
+                            row_deletable=True,
+                            dropdown={
+                                'Student': {'options': [{'label': i, 'value': i} for i in workhabit_options['Student']]},
+                                'Workhabit Score': {'options': [{'label': str(i), 'value': str(i)} for i in workhabit_options['Workhabit Score']]},
+                                'Worked On': {'options': [{'label': i, 'value': i} for i in workhabit_options['Worked On']]},
+                                'Support Attendance': {'options': [{'label': i, 'value': i} for i in workhabit_options['Support Attendance']]}
+                            }, 
+                            style_cell={'textAlign':'left', 'overflow':'visible'}, 
+                            style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}
+                        ),
+                                
+                    # Buttons for adding rows/submitting data
+                    html.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0),
+                    html.Button("Submit", id="submit-btn", n_clicks=0, style={"margin-left": "10px"}),
+
+                    # Output message
+                    html.Div(id="output-msg", style={"margin-top": "10px"})
+                ])            
+            ], width=3), 
+
+                # COLUMN 2 
+                dbc.Col([
+
                     # Student Schedule 
                     html.Div([
                         html.H5("Schedule"),
@@ -94,15 +146,17 @@ student_tab = html.Div([
                             ],
                             data=default_schedule, 
                             style_cell={'textAlign':'left'}, 
-                            style_header={'fontWeight': 'bold'}
+                            style_header={'fontWeight': 'bold'}, 
                         )
                     ], style={
                         'border': '2px solid #387c9f',
                         'border-radius': '8px', 
                         'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                         'padding':'10px', 
-                        'marginBottom': '15px' 
-                        }), 
+                        'marginBottom': '20px' 
+                        }
+                    ), 
+
                     # Attendance Bar Chart 
                     html.Div([
                         html.Div([
@@ -125,14 +179,11 @@ student_tab = html.Div([
                     ], style={'border': '2px solid #387c9f',
                           'border-radius': '8px', 
                           'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                          'padding':'10px'})
-                ], style={'flex': '1', 
-                          'padding': '10px', 
-                          'minWidth': '100px'}
-                          ),  
+                          'padding':'10px'}),                         
+                ], width=4),  
 
-                # COLUMN 2 
-                html.Div([
+                dbc.Col([
+                    # Workhabits Graphs 
                     html.Div([
                         html.H5("Study Habits", style={'margin-right': '50px'}),
                         dcc.RadioItems(
@@ -152,9 +203,11 @@ student_tab = html.Div([
                         'border-radius': '8px', 
                         'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                         'padding':'10px' }
-                    ),                    
-                ], style={'flex': '2', 'padding': '15px', 'minWidth': '600px'}),                 
-            ], style={'display': 'flex', 'justify-content': 'space-between', 'paddingTop':'10px', }) 
+                    ),             
+
+                ], width=5)
+            ], style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'20px', 'max-width': '100%'}
+            ) 
 
 # Task Tab 
 task_tab = html.Div([

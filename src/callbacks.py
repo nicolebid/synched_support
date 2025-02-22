@@ -1,12 +1,14 @@
 import dash.html as html
 import dash.dcc as dcc
 import datetime
+import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
 from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
+from .config import * 
 
 def register_callbacks(app):
 
@@ -80,6 +82,22 @@ def register_callbacks(app):
             else:
                 return timespent_barchart(selected_student)
     
+    # WORKHABIT DATA (user input)
+    # Add new row 
+    @app.callback(
+        Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+        Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
+        State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+        prevent_initial_call=True
+    )
+
+    def add_row(n_clicks, existing_data):
+        """Adds a blank row to the table when 'Add Row' is clicked."""
+        existing_data.append({"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""})
+        return existing_data
+
+    # merge callback with new callback to submit data, append to csv and reset table. 
+
     # TAB 2
     # Update 2nd Dropdown when first dropdown is selected
     @app.callback(

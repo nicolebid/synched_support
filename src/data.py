@@ -165,9 +165,6 @@ def deadlines(course_name=None, teacher_name=None):
         deadlines = deadlines.sort_values(by='Due')
         return deadlines.to_dict('records')   
 
-
-
-
 # FUNCTION CURRENTLY NOT BEING USED 
 def master_deadlines():
     """Retrieves the data from, deadlines.csv, to populate the deadline master table. 
