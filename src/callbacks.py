@@ -13,7 +13,7 @@ from .config import *
 
 def register_callbacks(app):
 
-        # Callback for Opening/Closing Modal
+    # Opening about popup
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open'),
         Input({'type': 'button', 'index': 'open-modal'}, 'n_clicks'),
@@ -36,7 +36,7 @@ def register_callbacks(app):
             return task_tab
 
     # TAB 1 
-    # Update the course table when the student is selected 
+    # Updating course table when the student is selected 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'course-table'}, 'data'), 
         [Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')] 
@@ -46,7 +46,7 @@ def register_callbacks(app):
             return student_schedule(selected_student)
         return default_schedule
 
-    # Update the attendance graph based on student and graph type 
+    # Updating attendance graph based on student and graph type 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'attendance-graph'}, 'figure'), 
         [Input({'type': 'dynamic-input', 'index': 'attendance-toggle'}, 'value'),
@@ -61,7 +61,7 @@ def register_callbacks(app):
             return attendance_barchart(selected_student, False)
         return attendance_barchart()
         
-    # Update the timeline/barchart graph based on student and graph type 
+    # Updating timeline/barchart graph based on student and graph selection 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'graph-output'}, 'figure'),
         [Input({'type': 'dynamic-input', 'index': 'graph-toggle'}, 'value'),
@@ -81,20 +81,43 @@ def register_callbacks(app):
                 return timespent_barchart(selected_student)
     
     # WORKHABIT DATA (user input)
-    # Add new row 
+    # Add new row/submit data/append to csv/reset table 
     @app.callback(
-        Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
-        Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
+        [
+            Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+            Output({'type': 'dynamic-output', 'index': 'output-msg'}, "children")    
+        ], 
+        [
+            Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
+            Input({'type': 'dynamic-input', 'index': 'submit-btn'}, "n_clicks"), 
+            Input({'type':'dynamic-input','index':'date-picker'}, 'date')
+        ], 
         State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+
+        # Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+        # Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
+        # State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
         prevent_initial_call=True
     )
 
-    def add_row(n_clicks, existing_data):
-        """Adds a blank row to the table when 'Add Row' is clicked."""
-        existing_data.append({"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""})
-        return existing_data
-
-    # merge callback with new callback to submit data, append to csv and reset table. 
+    def update_table(add_clicks, submit_clicks, date, existing_data):
+        ctx = dash.callback_context
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
+        
+        # add blank row when clicked
+        if 'add-row-btn' in triggered_id: 
+            existing_data.append({"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""})
+            return existing_data, ""
+        
+        # save submitted data
+        elif 'submit-btn' in triggered_id:
+            # function takes in data and date and saves to csv
+           
+            # reset data
+            reset_data = [{"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""}]
+            return reset_data, "Data added"
+        return existing_data, ""
+   
 
     # TAB 2
     # Update 2nd Dropdown when first dropdown is selected

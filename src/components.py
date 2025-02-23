@@ -85,7 +85,7 @@ student_tab = dbc.Row([
 
                         # Date 
                         html.Label("Date", style={'marginRight': '15px'}),
-                        dcc.DatePickerSingle(id="date-picker", placeholder="Select date", date=datetime.date.today(), style={'marginBottom':'10px'}),
+                        dcc.DatePickerSingle(id={'type':'dynamic-input', 'index':'date-picker'}, placeholder="Select date", date=datetime.date.today(), style={'marginBottom':'10px'}),
                         
                         # input table
                         dash_table.DataTable(
@@ -111,10 +111,10 @@ student_tab = dbc.Row([
                                 
                     # Buttons for adding rows/submitting data
                     html.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0),
-                    html.Button("Submit", id="submit-btn", n_clicks=0, style={"margin-left": "10px"}),
+                    html.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0, style={'margin-left': '10px'}),
 
                     # Output message
-                    html.Div(id="output-msg", style={"margin-top": "10px"})
+                    html.Div(id={'index':'output-msg','type':'dynamic-output'},  style={'margin-top': '10px'})
                 ])            
             ], width=3), 
 
