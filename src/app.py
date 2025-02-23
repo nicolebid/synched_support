@@ -22,8 +22,10 @@ app.layout = dbc.Container([
                                 style={'background-color': '#387c9f', 
                                        'padding-right': '12px',
                                        'padding-top': '12px',                                                                                     
-                                       'padding-bottom': '12px'})
+                                       'padding-bottom': '12px'}), 
+        info_section
         ], style={'flex': '0 0 auto', 'width': '100vw', 'margin': 0, 'padding': 0, 'background-color': '#387c9f' }),
+    
 
     # Main Content
     dbc.Row([

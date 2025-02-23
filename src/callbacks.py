@@ -1,3 +1,4 @@
+import dash
 import dash.html as html
 import dash.dcc as dcc
 import datetime
@@ -12,18 +13,15 @@ from .config import *
 
 def register_callbacks(app):
 
-    # Dropdown button for information
+        # Callback for Opening/Closing Modal
     @app.callback(
-        Output({'type': 'dynamic-output', 'index':"info"}, "is_open"),
-        [Input({'type': 'dynamic-input', 'index': 'info-button'}, "n_clicks")],
-        [State({'type': 'dynamic-state', 'index':'info'}, "is_open")],  
+        Output({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open'),
+        Input({'type': 'button', 'index': 'open-modal'}, 'n_clicks'),
+        [State({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open')],
+        prevent_initial_call=True
     )
-    def toggle_button(n, is_open):
-        print(n)  
-        print(is_open)  
-        if n:
-            return not is_open
-        return is_open
+    def toggle_modal(open_clicks, is_open):
+        return not is_open 
 
     # Active tab
     @app.callback(

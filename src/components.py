@@ -21,31 +21,18 @@ title = html.H1(
 
 info_button = dbc.Button(
     "About",
-    id="info-button",
+    id={'type': 'button', 'index': 'open-modal'},
     outline=True,
-    style={
-        'background-color': '#387c9f',
-        'color': 'white',
-        'border-radius': '20px',
-        'font-size': '18px',
-    }
+    n_clicks=0,
+    style={'background-color': '#387c9f', 'color': 'white', 'border-radius': '20px', 'font-size': '18px'}
 )
 
-app_info = [
-    html.P(
-        "<app info>", style={'font-size': '16px'}
-    ),
-    html.Br(),
-    html.P(
-        "<app instructions>", style={'font-size': '16px'}
-    )
-]
-
-info_section = dbc.Collapse(
-    app_info,
-    id="info",
-    style ={'background-color':'white', 
-            'padding': 10}
+info_section = dbc.Modal([
+        dbc.ModalHeader("About This App", close_button=True),  # Built-in close button
+        dbc.ModalBody("This is an app that tracks student work habits and progress."),
+    ],
+    id={'type': 'dynamic-output', 'index': 'about-modal'},
+    is_open=False,
 )
 
 # MAIN CONTENT 
