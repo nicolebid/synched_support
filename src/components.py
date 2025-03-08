@@ -126,19 +126,22 @@ student_tab = dbc.Row([
                         'border-radius': '8px', 
                         'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                         'padding':'10px', 
-                        'marginBottom':'15px' }
+                        'marginBottom':'25px'}
                     ),
 
                     # Notes input 
                     html.Div([
-                    
+                        html.H5("Notes", style={'marginBottom':'10px'}), 
                         dbc.Textarea(
                             id={'type': 'note-input', 'index': 'teacher-notes'}, 
                             placeholder='Type your notes here...', 
-                            style={"resize": "none", "height": "150px"}
+                            style={'width':'100%', "height": "150px"}
                         ), 
-                        html.Br(),
-                        dbc.Button('Save', id={'type': 'dynamic-input', 'index': 'save-note-button'},n_clicks=0, style={'margin-left': 'auto'})
+                        dbc.Button('Save', id={'type': 'dynamic-input', 'index': 'save-note-button'},n_clicks=0, 
+                                   style={'margin-left': 'auto', 'marginTop':'10px'}), 
+                        # Output message
+                        html.Div(id={'type':'dynamic-output','index':'output-msg-note'})
+                        
                     ],  style={'border': '2px solid #387c9f',
                         'border-radius': '8px', 
                         'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
@@ -179,7 +182,7 @@ student_tab = dbc.Row([
                           'border-radius': '8px', 
                           'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                           'padding':'10px', 
-                          'marginBottom':'15px'
+                          'marginBottom':'25px'
                     }),
       
                     # User Input - Student Workhabits
@@ -207,20 +210,21 @@ student_tab = dbc.Row([
                             style_table={'overflowX': 'visible', 'minWidth':'100%'},
                             style_cell={'textAlign': 'left', 'overflow': 'visible'},
                             style_data_conditional=[
-                                {'if': {'column_id': 'Student'}, 'width': '33%'},  # Wider
-                                {'if': {'column_id': 'Focus'}, 'width': '33%'},  # Wider
-                                {'if': {'column_id': 'Workhabit Score'}, 'width': '10%'},  # Narrower
-                                {'if': {'column_id': 'Support Attendance'}, 'width': '14%'},  # Narrower
+                                {'if': {'column_id': 'Student'}, 'width': '33%'}, 
+                                {'if': {'column_id': 'Focus'}, 'width': '33%'}, 
+                                {'if': {'column_id': 'Workhabit Score'}, 'width': '10%'},  
+                                {'if': {'column_id': 'Support Attendance'}, 'width': '14%'}, 
                             ],        
                             style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
                         ), 
-                        html.Br(),      
                         # Buttons for adding rows/submitting data
                         html.Div([
-                            dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0),
+                            dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0, style={'marginRight':'10px'}),
                             dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0)
-                        ], style={'margin-left': 'auto'}
-                        
+                        ], style={
+                            'display': 'flex',
+                            'justifyContent': 'flex-end',  
+                            'marginTop': '10px'} 
                         ),
                         # Output message
                         html.Div(id={'index':'output-msg','type':'dynamic-output'})

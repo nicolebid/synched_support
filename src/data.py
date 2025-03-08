@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
-from .config import STUDENT_DATA, DEADLINES_DATA
+from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE
+import os
 
 # TAB 1 - DATA 
 def student_list():
@@ -34,6 +35,64 @@ def student_schedule(student_name):
     schedule = df_student[['Block', 'Course', 'Teacher' ]]
     schedule = schedule.sort_values(by='Block')
     return schedule.to_dict('records')
+
+def get_student_note(student_name):
+    """Retrieves the note from the CSV file for the given student.
+    
+    Parameters
+    ----------
+    student_name: str
+        The name of the student to fetch the note for.
+    
+    Returns
+    -------
+    note: str
+        The note for the given student.  
+    """
+    if os.path.exists(STUDENT_NOTE):
+        df = pd.read_csv(STUDENT_NOTE)
+        student_note = df[df['Student'] == student_name]['Note']
+        if not student_note.empty:
+            note = student_note.iloc[0]
+        else:
+            note = None
+    return note
+
+def save_student_note(student_name, note):
+    """Updates (or saves) note in the the csv file with the new note for the given student. 
+    
+    Parameters
+    ----------
+    student_name: str
+        The name of the student to update the the note for.  
+    note: str
+        The note to save for the given student.   
+    
+    Returns
+    -------
+    str: Verified message.  
+    """
+    if os.path.exists(STUDENT_NOTE):
+        df = pd.read_csv(STUDENT_NOTE)
+        
+        # override previous note
+        if student_name in df['Student'].values:
+            df.loc[df['Student'] == student_name, 'Note'] = note
+
+        # create a new note if no previous note
+        else:
+            new = pd.DataFrame({'Student': [student_name], 'Note' : [note]})
+            df = pd.concat([df, new], ignore_index=True)
+
+        # Sace the updated data
+        df.to_csv(STUDENT_NOTE, index=False)
+
+    else:
+        df = pd.DataFrame({'Student': [student_name], 'Note': [note]})
+        df.to_csv(STUDENT_NOTE, index=False)
+
+    return "Note Saved."
+
 
 # TAB 2 - DATA
 def teacher_list():

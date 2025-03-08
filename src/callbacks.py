@@ -5,7 +5,7 @@ import datetime
 import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks
+from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
@@ -36,7 +36,7 @@ def register_callbacks(app):
             return task_tab
 
     # TAB 1 
-    # Updating course table when the student is selected 
+    # Updating student schedule when the student is selected 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'course-table'}, 'data'), 
         [Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')] 
@@ -79,6 +79,42 @@ def register_callbacks(app):
                 return workhabit_timeline(selected_student)
             else:
                 return timespent_barchart(selected_student)
+    
+    # Update Notes when student is selected
+    @app.callback(
+        Output({'type': 'note-input', 'index': 'teacher-notes'}, 'value'), 
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')
+    )
+    def update_notes(student_selected):
+        if not student_selected:
+            return "Select a student to view/edit notes..."
+        else:
+            # get to display
+            student_note = get_student_note(student_selected)
+            if student_note:
+                return student_note
+            return f"Type your notes for {student_selected} here..."
+
+    # Update student notes in CSV when save is clicked
+    @app.callback(
+        [Output({'type':'dynamic-output','index':'output-msg-note'}, 'children'),
+         Output({'type': 'dynamic-input', 'index': 'save-note-button'}, 'n_clicks')],
+        [Input({'type': 'note-input', 'index': 'teacher-notes'}, 'value'),  
+        Input({'type': 'dynamic-input', 'index': 'save-note-button'},'n_clicks'),
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')], 
+        State({'type': 'note-input', 'index': 'teacher-notes'}, 'value')      
+    )
+
+    def save_notes(note_value, n_clicks, student_selected, current_note_value):
+        if student_selected is None or note_value != current_note_value: 
+            return '', 0  # clears output message and resets button
+        
+        if n_clicks > 0: 
+
+            if student_selected and note_value:
+                save_student_note(student_selected, note_value)
+                return "Note saved.", 0 
+        return '', 0 
     
     # WORKHABIT DATA (user input)
     # Add new row/submit data/append to csv/reset table 
