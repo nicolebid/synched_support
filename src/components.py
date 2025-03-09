@@ -5,7 +5,7 @@ import datetime
 import pandas as pd 
 from collections import OrderedDict
 from dash import dash_table
-from .data import  student_list, upcoming_deadlines
+from .data import  student_list, upcoming_deadlines, save_workhabits_data
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 
 # HEADER
@@ -201,7 +201,7 @@ student_tab = dbc.Row([
                             data=[{'Student': None, 'Workhabit Score': None, 'Focus': None, 'Support Attendance':None}], 
                             columns=[
                                 {"id": "Student", "name": "Student"},
-                                {"id": "Score", "name": "Score"},
+                                {"id": "Workhabit Score", "name": "Score"},
                                 {"id": "Focus", "name": "Focus"},
                                 {"id": "Support Attendance", "name": "Support Attendance"}
                             ],

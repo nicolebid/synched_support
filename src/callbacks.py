@@ -5,7 +5,7 @@ import datetime
 import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note
+from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
@@ -129,10 +129,6 @@ def register_callbacks(app):
             Input({'type':'dynamic-input','index':'date-picker'}, 'date')
         ], 
         State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
-
-        # Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
-        # Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
-        # State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
         prevent_initial_call=True
     )
 
@@ -147,11 +143,11 @@ def register_callbacks(app):
         
         # save submitted data
         elif 'submit-btn' in triggered_id:
-            # function takes in data and date and saves to csv
+            saved = save_workhabits_data(existing_data, date)
            
             # reset data
             reset_data = [{"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""}]
-            return reset_data, "Data added"
+            return reset_data, saved
         return existing_data, ""
    
 

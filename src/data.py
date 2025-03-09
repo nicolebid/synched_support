@@ -1,6 +1,6 @@
 import pandas as pd
 import datetime
-from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE
+from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE, ATTEND_DATA
 import os
 
 # TAB 1 - DATA 
@@ -59,7 +59,7 @@ def get_student_note(student_name):
     return note
 
 def save_student_note(student_name, note):
-    """Updates (or saves) note in the the csv file with the new note for the given student. 
+    """Updates (or saves) note in the csv file with the new note for the given student. 
     
     Parameters
     ----------
@@ -84,7 +84,7 @@ def save_student_note(student_name, note):
             new = pd.DataFrame({'Student': [student_name], 'Note' : [note]})
             df = pd.concat([df, new], ignore_index=True)
 
-        # Sace the updated data
+        # Save the updated data
         df.to_csv(STUDENT_NOTE, index=False)
 
     else:
@@ -93,6 +93,54 @@ def save_student_note(student_name, note):
 
     return "Note Saved."
 
+def save_workhabits_data(data, date):
+    """Updates attendance_habits.csv file to include user entered data.
+    
+    Parameters
+    ----------
+    data: list
+        A list of dictionaries obtained from the the dash table.
+
+    date: str
+        The date for the data entry obtained from the dash datepicker component. 
+
+
+    Returns
+    -------
+    str: Verified message.  
+        
+    """
+    df_student = pd.read_csv(STUDENT_DATA)
+    clean_data = []
+    workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'Mostly On-task', '5':'On-task'}
+
+    for data_pt in data:
+        print(data_pt)
+        
+        # Set up
+        temp_pt = {}
+        df_course_block = df_student[df_student['Student'] == data_pt['Student']] # data for pulling Course, Block, Teacher
+        support_row = df_course_block[df_course_block['Course'].str.contains('Support')]
+
+        # obtain values
+        temp_pt['Student'] = data_pt['Student']
+        temp_pt['Date'] = date
+        temp_pt['Course'] = support_row['Course'].iloc[0]
+        temp_pt['Block'] = support_row['Block'].iloc[0]
+        temp_pt['Attendance'] = data_pt['Support Attendance']
+        temp_pt['Teacher'] = support_row['Teacher'].iloc[0]
+        temp_pt['Habit'] = workhabit_scores[data_pt['Workhabit Score']]
+        temp_pt['Work'] = data_pt['Focus']
+
+        clean_data.append(temp_pt)
+
+    # Save data
+    current_data = pd.read_csv(ATTEND_DATA)
+    df_clean = pd.DataFrame(clean_data)
+    df_updated = pd.concat([current_data, df_clean], ignore_index=True)
+    df_updated = df_updated.sort_values(by=['Student', 'Date'], ascending=[True, True])
+    df_updated.to_csv(ATTEND_DATA, index=False)
+    return "Data Saved."
 
 # TAB 2 - DATA
 def teacher_list():
