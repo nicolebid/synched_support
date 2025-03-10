@@ -151,9 +151,6 @@ student_tab = dbc.Row([
                         'align-items': 'flex-start' 
                         } 
                     )
-
-                             
-
                 ], width=5),
 
                 # COLUMN 3
@@ -290,15 +287,11 @@ task_tab = html.Div([
                         'marginBottom': '20px' 
                         }      
         )
-        
     ], style={'display': 'flex', 'gap': '10px', 'align-items': 'flex-start', 'paddingTop':'25px'}
     
     )
     ])
 
-
-# User input - attendance/workhabit
-# user input - tasks enter/remove
 
 # FOOTER
 
