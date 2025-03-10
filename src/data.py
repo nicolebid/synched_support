@@ -78,16 +78,15 @@ def save_student_note(student_name, note):
         # override previous note
         if student_name in df['Student'].values:
             df.loc[df['Student'] == student_name, 'Note'] = note
-
-        # create a new note if no previous note
         else:
+            # create a new note
             new = pd.DataFrame({'Student': [student_name], 'Note' : [note]})
             df = pd.concat([df, new], ignore_index=True)
 
-        # Save the updated data
         df.to_csv(STUDENT_NOTE, index=False)
 
     else:
+        # create dataframe
         df = pd.DataFrame({'Student': [student_name], 'Note': [note]})
         df.to_csv(STUDENT_NOTE, index=False)
 

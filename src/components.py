@@ -188,7 +188,7 @@ student_tab = dbc.Row([
                     # User Input - Student Workhabits
                     html.Div([
                         html.Div([
-                        html.H5("Enter Daily Workhabits", style={'marginBottom':'10px'}), 
+                        html.H5("Enter Daily Work Habits", style={'marginBottom':'10px'}), 
                         # Date 
                         dcc.DatePickerSingle(id={'type':'dynamic-input', 'index':'date-picker'}, 
                                              placeholder="Select date", date=datetime.date.today(), style={'marginBottom':'10px'})

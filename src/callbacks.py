@@ -180,7 +180,7 @@ def register_callbacks(app):
 
         if role == 'Student' and name:
             return html.Div([
-                html.H3(f'{name} - Tasks'),
+                html.H5(f'{name} - Tasks'),
                 dash_table.DataTable(
                     id={'type':'dynamic-input', 'index':'student-task-table'}, 
                     columns=[{'name':'Due', 'id':'Due'}, 
@@ -191,14 +191,26 @@ def register_callbacks(app):
                     data=student_deadlines(name),
                     style_cell={'textAlign':'center'},
                     style_header={'fontWeight': 'bold'}, 
-                    editable=True
-                )
+                    row_selectable='multi', 
+                    row_deletable=True
+                ), 
+                html.Div([
+                    # Output message
+                    html.Div(id={'type':'dynamic-output','index':'output-student-task'}),
+
+                    # Save button
+                    dbc.Button('Save', id={'type': 'dynamic-input', 'index': 'save-student-tasks'}, n_clicks=0, 
+                            style={'marginTop': '10px'})
+                ], style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'flex-end'})     
             ])
+
+
+        
         elif role == 'Teacher' and name: 
             teacher_roster_dict = teacher_roster(name)
             teacher_task_dict = teacher_tasks(name)
             return html.Div([
-            html.H3(f'{name} - Assigned Tasks'), 
+            html.H5(f'{name} - Assigned Tasks'), 
             dash_table.DataTable(
                 columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
                 data=[{col: '\n'.join(map(str, students)) for col, students in teacher_task_dict.items()},
@@ -210,5 +222,5 @@ def register_callbacks(app):
             ])
         else:
             return html.Div([
-                html.H3('Select a Student or Teacher')
+                html.H5('Select a Student or Teacher')
             ])

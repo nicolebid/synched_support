@@ -7,5 +7,5 @@ DATA_DIR = os.path.join(ROOT_DIR, 'data')
 # file paths 
 STUDENT_DATA = os.path.join(DATA_DIR, 'student.csv')
 ATTEND_DATA = os.path.join(DATA_DIR, 'attendance_habits.csv')
-DEADLINES_DATA = os.path.join(DATA_DIR, 'deadlines.csv')
+DEADLINES_DATA = os.path.join(DATA_DIR, 'master_deadlines.csv')
 STUDENT_NOTE = os.path.join(DATA_DIR, 'student_notes.csv')
