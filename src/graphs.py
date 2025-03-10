@@ -19,7 +19,7 @@ def attendance_counts(selected_student=None):
     if selected_student == None:
         return {'P': 0, 'L': 0, 'A': 0, 'AE': 0}  
     
-    df = pd.read_csv(ATTEND_CLASS_DATA)
+    df = pd.read_csv(ATTEND_DATA)
     df_student = df[df['Student'] == selected_student]
     student_attendance = df_student['Attendance']
     attendance = student_attendance.value_counts().to_dict()
@@ -28,7 +28,122 @@ def attendance_counts(selected_student=None):
         attendance.setdefault(key, value)
     return attendance
 
-def attendance_barchart(selected_student=None):
+def attendance_barchart(selected_student=None, overall=True):
+    """Fuction to generate bar charts for the selected student's attendance record, either one
+    single accumulated attendance bar chart or a bar chart for each course..
+    
+    Parameter
+    ---------
+    selected_student : str
+        User selected student from dropdown, to calculate the attendance count for.
+    overall: bool
+        If true, generates a single bar chart for the accumulated attendance. If False, a bar chart
+        for each course is returned. 
+    
+    Returns
+    -------
+    fig : plotly obj 
+        Plotly figure of the attendance barchart.
+    """
+
+    # Initial Chart 
+    if selected_student == None: 
+        attend_percent_t = [[0], [0], [0], [0]]
+        ordered_subjects=['']
+        attend_counts_t  = [[0], [0], [0], [0]]   
+        gap = 0    
+    else:    
+        # Import and set up data to plot 
+        attendance = pd.read_csv(ATTEND_DATA)
+        attendance_student = attendance[attendance['Student'] == selected_student]
+            
+        student_attendance_dict = {}
+        totals = {'P': 0, 'L': 0, 'AE': 0, 'A': 0}   
+
+        # get attendance for each course
+        for course in attendance_student['Course'].unique():
+                
+            attendance_course = attendance_student[attendance_student['Course'] == course]
+            attendance_col = attendance_course['Attendance']
+            attendance_counts = attendance_col.value_counts().to_dict()
+
+            for key, value in totals.items():
+                attendance_counts.setdefault(key, value)
+                student_attendance_dict[course] = attendance_counts
+
+        ordered_subjects = sorted(student_attendance_dict.keys(), reverse=True)
+        ordered_status = ['P', 'L', 'AE', 'A']    
+
+        # SET UP FOR OVERALL CHART   
+        if overall:
+            # Totals across courses 
+            for key, value in student_attendance_dict.items():
+                for key in totals:
+                    totals[key] += value.get(key, 0) 
+                
+            attend_counts=[totals[status] for status in ordered_status]
+            attend_counts_t=[[x] for x in attend_counts]
+            attend_percent_t=[[x/sum(attend_counts)*100 if sum(attend_counts) != 0 else 0] for x in attend_counts]
+            ordered_subjects=['']
+
+            # bar gap
+            gap = 0.7
+        else:
+        # SET UP FOR COURSE SPECIFIC CHARTS
+            attend_counts = [[student_attendance_dict[subject][status] for status in ordered_status] for subject in ordered_subjects]
+            attend_counts_t = [list(row) for row in zip(*attend_counts)]
+            attend_percent = [[round(x/sum(lst)*100, 2) if sum(lst) != 0 else 0 for x in lst] for lst in attend_counts]
+            attend_percent_t = [list(row) for row in zip(*attend_percent)]
+
+            # bar gap
+            gap = 0.2 
+        
+    # Plot 
+    status = ['Present', 'Late', 'Excused', 'Absent']
+    colors =['rgba(41, 118, 74, 0.8)', 'rgba(33, 42, 168, 0.8)', 
+                'rgba(239, 164, 107, 0.8)', 'rgba(194, 27, 24, 0.8)']
+        
+    # plot barcharts 
+    fig = go.Figure()
+
+    for n, xd in enumerate(attend_percent_t):
+        fig.add_trace(go.Bar(
+            y=ordered_subjects, 
+            x=xd, 
+            name=status[n],
+            orientation='h',
+            marker=dict(
+                color=colors[n],
+                line=dict( width=1)
+            ), 
+            customdata=attend_counts_t[n], 
+            hovertemplate=f'{status[n]}: %{{x:.0f}}% - %{{customdata}} time(s)<extra></extra>' 
+        )) 
+
+    fig.update_layout(
+        barmode='stack', 
+        template="plotly_white", 
+        margin=dict(l=20, r=20, t=20, b=20), 
+        xaxis=dict(
+            tickvals=[0, 20, 40, 60, 80, 100], 
+            ticktext=['0%', '20%', '40%', '60%', '80%', '100%'], 
+        ),
+        bargap=gap, 
+        height=300, 
+        autosize=True,
+        legend=dict(
+            orientation='h', 
+            yanchor='top', 
+            y=-0.2, 
+            xanchor='left',
+            x=0,
+            itemwidth=30, 
+            traceorder='normal'
+        ),
+    )
+    return fig 
+
+def attendance_barchart_none(selected_student=None):
     """Fuction to generate a barchart for the selected student's attendance record.
     
     Parameter
@@ -49,7 +164,6 @@ def attendance_barchart(selected_student=None):
     values = [attendance[category] for category in categories]
     labels = {'P': 'Present', 'L': 'Late', 'A': 'Absent', 'AE': 'Excused'}
 
-    # ticks
     total_classes = sum(attendance.values())
     tick_values = list(range(0, total_classes+1, 2)) 
 
@@ -65,7 +179,6 @@ def attendance_barchart(selected_student=None):
             legendgroup=category
         )
     )
-
     fig.update_layout(
         barmode='stack', 
         title=None,
@@ -105,7 +218,8 @@ def workhabit_timeline(selected_student=None):
     fig : plotly obj 
         Plotly figure of the student's work habits.
     """
-    attendance_data = pd.read_csv(ATTEND_SUPPORT_DATA)
+    attendance_data = pd.read_csv(ATTEND_DATA)
+    attendance_data = attendance_data[attendance_data['Course'].str.contains('Support')]
     attendance_data['Date'] = pd.to_datetime(attendance_data['Date'])
     attendance_data = attendance_data.sort_values(by='Date')
 
@@ -124,7 +238,7 @@ def workhabit_timeline(selected_student=None):
     attendance_filter = attendance_filter[['Date', 'Habit']]
 
     # Ordinal Categories 
-    habit_categories = ['Off-task', 'Mostly Off-task', 'Mostly On-task', 'On-task', 'Excellent']
+    habit_categories = ['Off-task', 'Mostly Off-task', 'Equally On/Off-task',  'Mostly On-task', 'On-task']
     attendance_filter['Habit'] = pd.Categorical(attendance_filter['Habit'], categories=habit_categories, ordered=True)
 
     # plot
@@ -133,9 +247,9 @@ def workhabit_timeline(selected_student=None):
         x=attendance_filter['Date'], 
         y=attendance_filter['Habit'].cat.codes, 
         mode='lines+markers',
-        line=dict(dash='dot'),
+        line=dict(dash='dot', color='rgba(41, 118, 74, 0.8)'),
         hovertemplate="<b>Date:</b> %{x|%b-%d}<br><b>Habit:</b> %{y}<br><extra></extra>" 
-    ))
+    )), 
 
     fig.update_layout(
         yaxis=dict(
@@ -161,7 +275,7 @@ def workhabit_timeline(selected_student=None):
     if selected_student != None:
         # red line for each NaN value
         for nan_date in nan_dates:
-            fig.add_vline(x=nan_date, line=dict(color="red", width=1 ))
+            fig.add_vline(x=nan_date, line=dict(color='rgba(194, 27, 24, 0.8)', width=1 ))
                 # Add an annotation with hover text
             fig.add_annotation(
                 x=nan_date,
@@ -175,7 +289,7 @@ def workhabit_timeline(selected_student=None):
                 arrowcolor="red",
                 opacity=0.7
             )
-    return fig 
+    return fig
 
 def timespent_barchart(selected_student=None):
     """Fuction to generate a bar chart for the selected student's time spent.
@@ -190,7 +304,8 @@ def timespent_barchart(selected_student=None):
     fig : plotly obj 
         Plotly figure of the student's time spent.
     """
-    df = pd.read_csv(ATTEND_SUPPORT_DATA)
+    df = pd.read_csv(ATTEND_DATA)
+    df[df['Course'].str.contains('Support')]
     df_student = df[df['Student'] == selected_student]
     subjects = df_student['Work']
     all_subjects = ["Art", "English", "French", "Math", "Science", "Socials", "Other"]
@@ -198,14 +313,12 @@ def timespent_barchart(selected_student=None):
     all_counts = pd.Series(subjects).value_counts().reindex(all_subjects, fill_value=0)
     subject_proportion = (all_counts/counts.sum())
 
-    colors = ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692"]
-
     fig = go.Figure()
 
     fig.add_trace(go.Bar(
         x=all_subjects, 
         y=subject_proportion, 
-        marker_color=colors, 
+        marker_color='rgba(33, 42, 168, 0.8)', 
         hovertemplate=(
         "<b>%{x}</b><br>"                 
         "Count: %{customdata}<br>"     
