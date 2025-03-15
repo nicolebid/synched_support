@@ -1,11 +1,12 @@
 import dash
+from dash import ctx
 import dash.html as html
 import dash.dcc as dcc
 import datetime
 import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data
+from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
@@ -172,7 +173,7 @@ def register_callbacks(app):
     
     # Tab 2 - Col 2 task tables 
     @app.callback(
-        Output({'type': 'dynamic-input', 'index': 'dynamic-t2-col2'}, 'children'), 
+        Output({'type': 'dynamic-input', 'index': 'dynamic-task-tables'}, 'children'), 
         [Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value'), 
          Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value')]
     )
@@ -194,6 +195,7 @@ def register_callbacks(app):
                     row_selectable='multi', 
                     row_deletable=True
                 ), 
+
                 html.Div([
                     # Output message
                     html.Div(id={'type':'dynamic-output','index':'output-student-task'}),
@@ -204,8 +206,6 @@ def register_callbacks(app):
                 ], style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'flex-end'})     
             ])
 
-
-        
         elif role == 'Teacher' and name: 
             teacher_roster_dict = teacher_roster(name)
             teacher_task_dict = teacher_tasks(name)
@@ -224,3 +224,69 @@ def register_callbacks(app):
             return html.Div([
                 html.H5('Select a Student or Teacher')
             ])
+    @app.callback(
+        Output({'type': 'dynamic-output', 'index': 'output-student-task'}, 'children'),
+        Input({'type': 'dynamic-input', 'index': 'save-student-tasks'}, 'n_clicks'),
+        State({'type': 'dynamic-input', 'index': 'student-task-table'}, 'data'),
+        State({'type': 'dynamic-input', 'index': 'student-task-table'}, 'derived_virtual_selected_rows'),
+        State({'type': 'dynamic-input', 'index': 'select-item'}, 'value'), 
+        prevent_initial_call=True
+    )
+    def save_task_updates(n_clicks, data, selected_rows_ind, student_name):
+        # current csv
+        df_tasks = pd.read_csv(STUDENT_TASKS)
+        df_student_tasks  = df_tasks[df_tasks['Student'] == student_name]
+        message = "test"
+        # update status of deleted rows in csv
+        if len(df_student_tasks) > len(data):
+            message = save_deleted_changes(data, student_name)
+        
+
+        # print(selected_rows_ind)
+        # selected_rows_data = {data[i]['Task'] for i in selected_rows_ind}
+        # print('selected_rows', selected_rows_data)
+  
+        return message
+
+
+
+
+
+
+    # DEADLINES DATA (user input)
+    # Add new row/submit data/append to csv/reset table 
+    @app.callback(
+        [
+            Output({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
+            Output({'type': 'dynamic-output', 'index': 'output-msg-deadlines'}, "children")    
+        ], 
+        [
+            Input({'type': 'dynamic-input', 'index': 'add-row-deadlines'}, "n_clicks"),
+            Input({'type': 'dynamic-input', 'index': 'submit-deadlines'}, "n_clicks"), 
+       ], 
+        State({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
+        prevent_initial_call=True
+    )
+
+    def update_table(add_clicks, submit_clicks, existing_data):
+        ctx = dash.callback_context
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
+        
+        # add blank row when clicked
+        if 'add-row-deadlines' in triggered_id: 
+            existing_data.append({"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""})
+            return existing_data, ""
+        
+        # save submitted data
+        elif 'submit-deadlines' in triggered_id:
+            saved = save_deadlines_data(existing_data)
+           
+            # reset data
+            reset_data = [{"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""}]
+            return reset_data, saved
+        return existing_data, ""
+   
+
+
+        
+    

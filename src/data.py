@@ -1,6 +1,6 @@
 import pandas as pd
 import datetime
-from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE, ATTEND_DATA
+from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE, ATTEND_DATA, STUDENT_TASKS
 import os
 
 # TAB 1 - DATA 
@@ -114,8 +114,7 @@ def save_workhabits_data(data, date):
     workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'Mostly On-task', '5':'On-task'}
 
     for data_pt in data:
-        print(data_pt)
-        
+
         # Set up
         temp_pt = {}
         df_course_block = df_student[df_student['Student'] == data_pt['Student']] # data for pulling Course, Block, Teacher
@@ -196,13 +195,12 @@ def student_deadlines(student):
     -------- 
     list : A list of dictionaries containing tasks for the student. 
     """
-    df_deadlines = pd.read_csv(DEADLINES_DATA)
-    df_student = pd.read_csv(STUDENT_DATA)
-    df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
-    df_student_deadlines = df_merged[df_merged['Student'] == student].copy()
-    df_student_deadlines['Due'] = pd.to_datetime(df_student_deadlines['Due']).dt.strftime('%b %d')  
-    df_return = df_student_deadlines[['Due', 'Task', 'Course', 'Teacher', 'Block']]
-    return df_return.to_dict('records')
+    df_tasks = pd.read_csv(STUDENT_TASKS)
+    df_tasks_student = df_tasks[df_tasks['Student'] == student].copy()
+    df_tasks_student['Due'] = pd.to_datetime(df_tasks_student['Due']).dt.strftime('%b %d')
+    df_filter = df_tasks_student[df_tasks_student['Hidden'] != True]  
+    df_format = df_filter[['Due', 'Task', 'Course', 'Teacher', 'Block']]
+    return df_format.to_dict('records')
 
 def teacher_roster(teacher):
     """Retrieves the students in each of the teachers classes. 
@@ -242,6 +240,71 @@ def teacher_tasks(teacher):
         df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
 
+def save_deadlines_data(data):
+    """Updates master_deadlines.csv to include user entered data.
+    
+    Parameters
+    ----------
+    data: list
+        A list of dictionaries obtained from the the dash table.
+
+    Returns
+    -------
+    str: Verified message.  
+    """
+    clean_data = []
+    
+    for data_pt in data:        
+        temp_pt = {}
+        
+        # obtain values
+        temp_pt['Task'] = data_pt['Task'].strip()
+        temp_pt['Course'] = data_pt['Course'].strip().capitalize()
+        temp_pt['Block'] = data_pt['Block'].strip()
+        temp_pt['Teacher'] = data_pt['Teacher'].strip().capitalize()
+        temp_pt['Due'] = data_pt['Due'].strip()
+        clean_data.append(temp_pt)
+
+    # Save data
+    current_data = pd.read_csv(DEADLINES_DATA)
+    df_clean = pd.DataFrame(clean_data)
+    df_updated = pd.concat([current_data, df_clean], ignore_index=True)
+    df_updated = df_updated.sort_values(by=['Due', 'Teacher'], ascending=[True, True])
+    df_updated.to_csv(DEADLINES_DATA, index=False)
+    return "Data successfully saved."
+
+def save_deleted_changes(data, student_name):
+    """Updates student_tasks.csv to includes changes to 'Hidden' column when user deletes
+    rows in student task table.
+    
+    Parameters
+    ----------
+    data: list
+        A list of dictionaries obtained from the the dash table.
+    
+    student_name: string  
+        The name of the students data to edit. 
+
+    Returns
+    -------
+    str: Verified message.  
+    """
+    df_tasks = pd.read_csv(STUDENT_TASKS)
+    df_student_tasks = df_tasks[df_tasks['Student'] == student_name]
+
+    for item in data:
+        item.pop('Due', None)
+
+    for index, row in df_student_tasks.iterrows():
+        row_dict = row[['Task', 'Course', 'Teacher', 'Block']].to_dict()
+        if row_dict not in data:
+            df_student_tasks.at[index, 'Hidden'] = True
+    
+    # Save changes
+    print(df_student_tasks)
+    df_tasks.update(df_student_tasks)
+    df_tasks.to_csv(STUDENT_TASKS, index=False)
+    return "Data successfully saved."
 
 # FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):

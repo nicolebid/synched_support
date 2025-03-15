@@ -279,18 +279,77 @@ task_tab = html.Div([
              
         # COLUMN 2
         html.Div([
-            html.Div(id={'type': 'dynamic-input', 'index': 'dynamic-t2-col2'})
-        ], style={'flex': '3', 'border': '2px solid #387c9f',
-                        'border-radius': '8px', 
-                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                        'padding':'10px', 
-                        'marginBottom': '20px' 
-                        }      
-        )
+            # Task Display Table
+            html.Div([
+                html.Div(id={'type': 'dynamic-input', 'index': 'dynamic-task-tables'}),
+            ], style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding': '10px', 
+                'marginBottom': '10px', 
+                'minHeight': '20vh'
+            }),
+
+            # User Input - Deadlines 
+            html.Div([
+                html.H5("Enter New Tasks", style={'marginBottom':'10px'}), 
+                # Table Input
+                dash_table.DataTable(
+                            id={'type': 'user-input', 'index': 'deadlines-table'},
+                            data=[{'Task': None, 'Course': None, 'Block': None, 'Teacher':None, 'Due': None}], 
+                            columns=[ 
+                                {"id": "Task", "name": "Task"},
+                                {"id": "Course", "name": "Course"},
+                                {"id": "Block", "name": "Block"},
+                                {"id": "Teacher", "name": "Teacher"},
+                                {"id": "Due", "name": "Due"}
+                            ],
+                            editable=True,
+                            row_deletable=True,
+                            style_table={'overflowX': 'visible', 'minWidth':'100%'},
+                            style_cell={'textAlign': 'left', 'overflow': 'visible'},
+                            style_data_conditional=[
+                                {'if': {'column_id': 'Task'}, 'width': '30%'}, 
+                                {'if': {'column_id': 'Course'}, 'width': '15%'}, 
+                                {'if': {'column_id': 'Block'}, 'width': '10%'},  
+                                {'if': {'column_id': 'Teacher'}, 'width': '25%'}, 
+                                {'if': {'column_id': 'Due'}, 'width': '20%'} 
+
+                            ],        
+                            style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
+                        ),
+                        html.Div([
+                            dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px'}),
+                            dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0)
+                        ], style={
+                            'display': 'flex',
+                            'justifyContent': 'flex-end',  
+                            'marginTop': '10px'} 
+                        ),
+                        # Output message
+                        html.Div(id={'index':'output-msg-deadlines','type':'dynamic-output'}) 
+                      
+            ], style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding': '10px', 
+                'marginBottom': '20px', 
+                'minHeight': '20vh'
+            }),
+
+        ], style={
+            'flex': '3',  
+            'display': 'flex',  
+            'flex-direction': 'column',  
+            'gap': '10px'
+        })
+
     ], style={'display': 'flex', 'gap': '10px', 'align-items': 'flex-start', 'paddingTop':'25px'}
-    
     )
-    ])
+
+])
 
 
 # FOOTER
