@@ -18,7 +18,7 @@ def register_callbacks(app):
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open'),
         Input({'type': 'button', 'index': 'open-modal'}, 'n_clicks'),
-        [State({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open')],
+        State({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open'),
         prevent_initial_call=True
     )
     def toggle_modal(open_clicks, is_open):
@@ -40,7 +40,7 @@ def register_callbacks(app):
     # Updating student schedule when the student is selected 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'course-table'}, 'data'), 
-        [Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')] 
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value') 
     )
     def update_schedule(selected_student):
         if selected_student:
@@ -50,8 +50,10 @@ def register_callbacks(app):
     # Updating attendance graph based on student and graph type 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'attendance-graph'}, 'figure'), 
-        [Input({'type': 'dynamic-input', 'index': 'attendance-toggle'}, 'value'),
-         Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')]  
+        [
+            Input({'type': 'dynamic-input', 'index': 'attendance-toggle'}, 'value'),
+            Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')
+        ]  
     )
     def update_attendance_bar_chart(selected_graph, selected_student):
         if not selected_student:
@@ -98,11 +100,15 @@ def register_callbacks(app):
 
     # Update student notes in CSV when save is clicked
     @app.callback(
-        [Output({'type':'dynamic-output','index':'output-msg-note'}, 'children'),
-         Output({'type': 'dynamic-input', 'index': 'save-note-button'}, 'n_clicks')],
-        [Input({'type': 'note-input', 'index': 'teacher-notes'}, 'value'),  
-        Input({'type': 'dynamic-input', 'index': 'save-note-button'},'n_clicks'),
-        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')], 
+        [
+            Output({'type':'dynamic-output','index':'output-msg-note'}, 'children'),
+            Output({'type': 'dynamic-input', 'index': 'save-note-button'}, 'n_clicks')
+        ],
+        [   
+            Input({'type': 'note-input', 'index': 'teacher-notes'}, 'value'),  
+            Input({'type': 'dynamic-input', 'index': 'save-note-button'},'n_clicks'),
+            Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')
+        ], 
         State({'type': 'note-input', 'index': 'teacher-notes'}, 'value')      
     )
 
@@ -155,8 +161,10 @@ def register_callbacks(app):
     # TAB 2
     # Update 2nd Dropdown when first dropdown is selected
     @app.callback(
-        [Output({'type': 'dynamic-input', 'index': 'select-item'}, 'options'),
-         Output({'type': 'dynamic-input', 'index': 'select-item'}, 'placeholder')],
+        [
+            Output({'type': 'dynamic-input', 'index': 'select-item'}, 'options'),
+            Output({'type': 'dynamic-input', 'index': 'select-item'}, 'placeholder')
+        ],
         Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value')
     )
     def update_dropdown(selected_type=None):
@@ -172,10 +180,14 @@ def register_callbacks(app):
         return options, placeholder
     
     # Tab 2 - Col 2 task tables 
+    task_default_df = pd.DataFrame([['','','','']]*3)
+
     @app.callback(
         Output({'type': 'dynamic-input', 'index': 'dynamic-task-tables'}, 'children'), 
-        [Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value'), 
-         Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value')]
+        [
+            Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value'), 
+            Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value')
+        ]
     )
     def update_content_t2col2(role, name):
 
@@ -225,7 +237,14 @@ def register_callbacks(app):
             ])
         else:
             return html.Div([
-                html.H5('Select a Student or Teacher')
+                html.H5('Tasks'), 
+                dash_table.DataTable(
+                    id='default-table',
+                    columns=[{'name': '', 'id': ''}, {'name': '', 'id': ''}, {'name': '', 'id': ''}],
+                    data=task_default_df.to_dict('records'),
+                    style_table={'height': '200px', 'width': '100%'
+                    },
+                )
             ])
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'output-student-task'}, 'children'),
@@ -239,23 +258,17 @@ def register_callbacks(app):
         # current csv
         df_tasks = pd.read_csv(STUDENT_TASKS)
         df_student_tasks  = df_tasks[df_tasks['Student'] == student_name]
-        mdg_del = ""
-        msg_sel = ""
+        msg = ""
                 
         # update status of deleted rows in csv
         if len(df_student_tasks) > len(data):
-            msg_del = save_deleted_changes(data, student_name)
+            msg = save_deleted_changes(data, student_name)
         
         # update status of selected rows in csv
         if selected_rows_ind is not None:
             selected_rows_data = [data[i] for i in selected_rows_ind]
-            msg_sel = save_checked_changes(selected_rows_data, student_name)
-        return str(msg_del + msg_sel)
-
-
-
-
-
+            msg = save_checked_changes(selected_rows_data, student_name)
+        return msg
 
     # DEADLINES DATA (user input)
     # Add new row/submit data/append to csv/reset table 

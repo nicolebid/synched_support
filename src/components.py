@@ -61,181 +61,203 @@ default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': 
 
 # Student Tab 
 student_tab = dbc.Row([
-                dbc.Col([
-                    # COLUMN 1 
-                    # Student Selection
-                    dcc.Dropdown(
-                        id={'type': 'dynamic-input', 'index': 'student-select'},
-                        options=student_list(), 
-                        value='A', 
-                        placeholder='Select Student...', 
-                        style={'marginBottom': '30px'} 
-                    ),  
-                    # Student Schedule 
-                    html.Div([
-                        html.H5("Schedule"),
-                        dash_table.DataTable(
-                            id={'type': 'dynamic-output', 'index': 'course-table'},
-                            columns=[
-                                {'name': 'Block', 'id': 'Block'},
-                                {'name': 'Course', 'id': 'Course'},
-                                {'name': 'Teacher', 'id': 'Teacher'}       
-                            ],
-                            data=default_schedule, 
-                            style_cell={'textAlign':'left', 'fontSize':'14px'}, 
-                            style_header={'fontWeight': 'bold'}                           
-                        )
-                    ], style={
-                        'border': '2px solid #387c9f',
-                        'border-radius': '8px', 
-                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                        'padding':'15px', 
-                        'marginBottom': '20px', 
-                        'flex-grow': '1', 
-                        'height': '35vh', 
-                        'min-height': '325px'
-                        }
-                    ),
+    # COLUMN 1
+    dbc.Col([   
+    # Student Selection
+        dcc.Dropdown(
+            id={'type': 'dynamic-input', 'index': 'student-select'},
+            options=student_list(), 
+            value='A', 
+            placeholder='Select a student...', 
+            style={'marginBottom': '30px'} 
+        ),  
+        # Student Schedule 
+        html.Div([
+            html.H5("Schedule"),
+            dash_table.DataTable(
+                id={'type': 'dynamic-output', 'index': 'course-table'},
+                columns=[
+                    {'name': 'Block', 'id': 'Block'},
+                    {'name': 'Course', 'id': 'Course'},
+                    {'name': 'Teacher', 'id': 'Teacher'}       
+                ],
+                data=default_schedule, 
+                style_cell={'textAlign':'left', 'fontSize':'14px'}, 
+                style_header={'fontWeight': 'bold'}                           
+            )
+        ], 
+        style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'15px', 
+                'marginBottom': '20px', 
+                'flex-grow': '1', 
+                'height': '35vh', 
+                'min-height': '325px'
+        }
+        ),
 
-            ], width=3), 
-
-                # COLUMN 2 
-                dbc.Col([
-                    # Workhabits Graphs 
-                    html.Div([
-                        html.Div([
-                            html.H5("Study Habits"),
-                            dcc.RadioItems(
-                                id={'type': 'dynamic-input', 'index': 'graph-toggle'},
-                                options=[
-                                    {'label': ' Work Habits', 'value': 'timeline'},
-                                    {'label': ' Time Spent', 'value': 'barchart'}
-                                ],
-                                value='timeline', 
-                                labelStyle={'display':'inline-block', 'padding': '10px'}
-                            )
-                        ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}),
-                        dcc.Graph(
-                            id={'type': 'dynamic-output', 'index': 'graph-output'},
-                            config={'displayModeBar':False},
-                            style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'} 
-                        ), 
+    ], width=3), 
+    # COLUMN 2 
+    dbc.Col([
+        # Workhabits Graphs 
+        html.Div([
+            html.Div([
+                html.H5("Study Habits"),
+                dcc.RadioItems(
+                    id={'type': 'dynamic-input', 'index': 'graph-toggle'},
+                    options=[
+                        {'label': ' Work Habits', 'value': 'timeline'},
+                        {'label': ' Time Spent', 'value': 'barchart'}
+                    ],
+                    value='timeline', 
+                    labelStyle={'display':'inline-block', 'padding': '10px'}
+                )
+            ], 
+                style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}),
+            dcc.Graph(
+                id={'type': 'dynamic-output', 'index': 'graph-output'},
+                config={'displayModeBar':False},
+                style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'} 
+            ), 
    
 
-                    ], style={'border': '2px solid #387c9f',
-                        'border-radius': '8px', 
-                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                        'padding':'10px', 
-                        'marginBottom':'25px'}
-                    ),
+        ], 
+            style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'10px', 
+                'marginBottom':'25px'
+            }
+        ),
 
-                    # Notes input 
-                    html.Div([
-                        html.H5("Notes", style={'marginBottom':'10px'}), 
-                        dbc.Textarea(
-                            id={'type': 'note-input', 'index': 'teacher-notes'}, 
-                            placeholder='Type your notes here...', 
-                            style={'width':'100%', "height": "150px"}
-                        ), 
-                        dbc.Button('Save', id={'type': 'dynamic-input', 'index': 'save-note-button'},n_clicks=0, 
-                                   style={'margin-left': 'auto', 'marginTop':'10px'}), 
-                        # Output message
-                        html.Div(id={'type':'dynamic-output','index':'output-msg-note'})
+        # Notes input 
+        html.Div([
+            html.H5("Notes", style={'marginBottom':'10px'}), 
+            dbc.Textarea(
+                id={'type': 'note-input', 'index': 'teacher-notes'}, 
+                placeholder='Type your notes here...', 
+                style={'width':'100%', "height": "150px"}
+            ), 
+            dbc.Button(
+                'Save', 
+                id={'type': 'dynamic-input', 'index': 'save-note-button'},
+                n_clicks=0, 
+                style={'margin-left': 'auto', 'marginTop':'10px'}), 
+            # Output message
+            html.Div(id={'type':'dynamic-output','index':'output-msg-note'})
                         
-                    ],  style={'border': '2px solid #387c9f',
-                        'border-radius': '8px', 
-                        'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                        'padding':'10px', 
-                        'display': 'flex',  
-                        'flex-direction': 'column',  
-                        'align-items': 'flex-start' 
-                        } 
-                    )
-                ], width=5),
+        ],  
+            style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'10px', 
+                'display': 'flex',  
+                'flex-direction': 'column',  
+                'align-items': 'flex-start' 
+            } 
+        )
+    ], width=5),
 
-                # COLUMN 3
-                dbc.Col([
-                    # Attendance Bar Chart 
-                    html.Div([
-                        html.Div([
-                            html.H5("Attendance", style={'margin-right': '50px'}),
-                            dcc.RadioItems(
-                                id={'type': 'dynamic-input', 'index': 'attendance-toggle'},
-                                options=[
-                                    {'label': ' Overall', 'value': 'overall-attend'},
-                                    {'label': ' Course Specific', 'value': 'course-attend'}
-                                ],
-                                value='overall-attend', 
-                                labelStyle={'display':'inline-block', 'padding':'10px'}
-                            )
-                        ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}), 
-                        dcc.Graph(
-                            id={'type': 'dynamic-output', 'index': 'attendance-graph'},
-                            figure=initial_attendance_graph,
-                            config={'displayModeBar': False},
-                            style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'} 
-                        )
-                    ], style={'border': '2px solid #387c9f',
-                          'border-radius': '8px', 
-                          'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                          'padding':'10px', 
-                          'marginBottom':'25px'
-                    }),
-      
-                    # User Input - Student Workhabits
-                    html.Div([
-                        html.Div([
-                        html.H5("Enter Daily Work Habits", style={'marginBottom':'10px'}), 
-                        # Date 
-                        dcc.DatePickerSingle(id={'type':'dynamic-input', 'index':'date-picker'}, 
-                                             placeholder="Select date", date=datetime.date.today(), style={'marginBottom':'10px'})
-                        ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}  
-                        ), 
-
-                        # input table
-                        dash_table.DataTable(
-                            id={'type': 'user-input', 'index': 'workhabit-table'},
-                            data=[{'Student': None, 'Workhabit Score': None, 'Focus': None, 'Support Attendance':None}], 
-                            columns=[
-                                {"id": "Student", "name": "Student"},
-                                {"id": "Workhabit Score", "name": "Score"},
-                                {"id": "Focus", "name": "Focus"},
-                                {"id": "Support Attendance", "name": "Support Attendance"}
-                            ],
-                            editable=True,
-                            row_deletable=True,
-                            style_table={'overflowX': 'visible', 'minWidth':'100%'},
-                            style_cell={'textAlign': 'left', 'overflow': 'visible'},
-                            style_data_conditional=[
-                                {'if': {'column_id': 'Student'}, 'width': '33%'}, 
-                                {'if': {'column_id': 'Focus'}, 'width': '33%'}, 
-                                {'if': {'column_id': 'Workhabit Score'}, 'width': '10%'},  
-                                {'if': {'column_id': 'Support Attendance'}, 'width': '14%'}, 
-                            ],        
-                            style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
-                        ), 
-                        # Buttons for adding rows/submitting data
-                        html.Div([
-                            dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0, style={'marginRight':'10px'}),
-                            dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0)
-                        ], style={
-                            'display': 'flex',
-                            'justifyContent': 'flex-end',  
-                            'marginTop': '10px'} 
-                        ),
-                        # Output message
-                        html.Div(id={'index':'output-msg','type':'dynamic-output'})
-                        ], style={'border': '2px solid #387c9f', 
-                                'border-radius': '8px', 
-                                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                                'padding':'10px',
-                                'overflow': 'visible'                             
-                            }
-                            )                           
-                ], width=4),  
-
-            ], style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'20px', 'max-width': '100%'}
+    # COLUMN 3
+    dbc.Col([
+        # Attendance Bar Chart 
+        html.Div([
+            html.Div([
+                html.H5("Attendance", style={'margin-right': '50px'}),
+                dcc.RadioItems(
+                    id={'type': 'dynamic-input', 'index': 'attendance-toggle'},
+                    options=[
+                        {'label': ' Overall', 'value': 'overall-attend'},
+                        {'label': ' Course Specific', 'value': 'course-attend'}
+                    ],
+                    value='overall-attend', 
+                    labelStyle={'display':'inline-block', 'padding':'10px'}
+                )
+            ], 
+                style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}), 
+            dcc.Graph(
+                id={'type': 'dynamic-output', 'index': 'attendance-graph'},
+                figure=initial_attendance_graph,
+                config={'displayModeBar': False},
+                style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'} 
             )
+        ], 
+            style={'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'10px', 
+                'marginBottom':'25px'
+            }
+        ),
+      
+        # User Input - Student Workhabits
+        html.Div([
+            html.Div([
+                html.H5("Daily Work Habits", style={'marginBottom':'10px'}), 
+                # Date 
+                dcc.DatePickerSingle(
+                    id={'type':'dynamic-input', 'index':'date-picker'}, 
+                    placeholder="Select date", date=datetime.date.today(), 
+                    style={'marginBottom':'10px'}
+                )
+            ], 
+                style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}  
+            ), 
+
+            # input table
+            dash_table.DataTable(
+                id={'type': 'user-input', 'index': 'workhabit-table'},
+                data=[{'Student': None, 'Workhabit Score': None, 'Focus': None, 'Support Attendance':None}], 
+                columns=[
+                    {"id": "Student", "name": "Student"},
+                    {"id": "Workhabit Score", "name": "Score"},
+                    {"id": "Focus", "name": "Focus"},
+                    {"id": "Support Attendance", "name": "Support Attendance"}
+                ],
+                editable=True,
+                row_deletable=True,
+                style_table={'overflowX': 'visible', 'minWidth':'100%'},
+                style_cell={'textAlign': 'left', 'overflow': 'visible'},
+                style_data_conditional=[
+                    {'if': {'column_id': 'Student'}, 'width': '33%'}, 
+                    {'if': {'column_id': 'Focus'}, 'width': '33%'}, 
+                    {'if': {'column_id': 'Workhabit Score'}, 'width': '10%'},  
+                    {'if': {'column_id': 'Support Attendance'}, 'width': '14%'}, 
+                ],
+                    style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
+            ), 
+            # Buttons for adding rows/submitting data
+            html.Div([
+                dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0, style={'marginRight':'10px'}),
+                dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0)
+            ], 
+                style={
+                    'display': 'flex',
+                    'justifyContent': 'flex-end',  
+                    'marginTop': '10px'} 
+            ),
+            # Output message
+            html.Div(id={'index':'output-msg','type':'dynamic-output'})
+        ], 
+            style={
+                'border': '2px solid #387c9f', 
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'10px',
+                'overflow': 'visible'                             
+            }
+        )                           
+    ], 
+        width=4
+    ),  
+
+], 
+    style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'20px', 'max-width': '100%'}
+)
 
 # Task Tab 
 task_tab = html.Div([
@@ -249,12 +271,12 @@ task_tab = html.Div([
                     {'label': 'Student', 'value': 'Student'},
                     {'label': 'Teacher', 'value': 'Teacher'}
                 ],
-                placeholder='Select a Student or Teacher...'
+                placeholder='Select Student or Teacher...'
             ),
             html.Br(),
             dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': 'select-item'}, 
-                placeholder='Select Item', 
+                placeholder='select item', 
             ),
             html.Br(),
             # Upcoming Deadlines
@@ -293,7 +315,7 @@ task_tab = html.Div([
 
             # User Input - Deadlines 
             html.Div([
-                html.H5("Enter New Tasks", style={'marginBottom':'10px'}), 
+                html.H5("New Tasks", style={'marginBottom':'10px'}), 
                 # Table Input
                 dash_table.DataTable(
                             id={'type': 'user-input', 'index': 'deadlines-table'},
@@ -353,7 +375,6 @@ task_tab = html.Div([
 
 
 # FOOTER
-
 footer_info = [
     html.A('Source Code on GitHub.', href='<link>', style={'font-size': '14px', 'margin-bottom': '10px', 'color': 'white'}),
     html.P('Last updated on <date>', style={'font-size': '12px', 'margin-bottom': '10px'}),   

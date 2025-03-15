@@ -285,7 +285,7 @@ def save_deadlines_data(data):
     df_updated = pd.concat([current_data, df_clean], ignore_index=True)
     df_updated = df_updated.sort_values(by=['Due', 'Teacher'], ascending=[True, True])
     df_updated.to_csv(DEADLINES_DATA, index=False)
-    return "Data successfully saved."
+    return "Data saved successfully."
 
 def save_deleted_changes(data, student_name):
     """Updates student_tasks.csv to includes changes to 'Hidden' column when user deletes
@@ -316,7 +316,7 @@ def save_deleted_changes(data, student_name):
     # Save changes
     df_tasks.update(df_student_tasks)
     df_tasks.to_csv(STUDENT_TASKS, index=False)
-    return "Deleted changes saved successfully."
+    return "Changes saved successfully."
 
 def save_checked_changes(selected_rows_data, student_name):
     """Updates student_tasks.csv to include changes to 'Completed' column when user checks
@@ -350,7 +350,7 @@ def save_checked_changes(selected_rows_data, student_name):
     # Save changes
     df_tasks.update(df_student_tasks)
     df_tasks.to_csv(STUDENT_TASKS, index=False)
-    return "Selected changes saved successfully."
+    return "Changes saved successfully."
 
 # FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):
