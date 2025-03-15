@@ -6,7 +6,7 @@ import datetime
 import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes
+from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes, save_checked_changes
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
@@ -180,6 +180,8 @@ def register_callbacks(app):
     def update_content_t2col2(role, name):
 
         if role == 'Student' and name:
+            table_data, selected_indicies = student_deadlines(name)
+
             return html.Div([
                 html.H5(f'{name} - Tasks'),
                 dash_table.DataTable(
@@ -189,11 +191,12 @@ def register_callbacks(app):
                              {'name':'Course', 'id':'Course'}, 
                              {'name':'Teacher', 'id':'Teacher'}, 
                              {'name':'Block', 'id':'Block'}], 
-                    data=student_deadlines(name),
+                    data=table_data,
                     style_cell={'textAlign':'center'},
                     style_header={'fontWeight': 'bold'}, 
                     row_selectable='multi', 
-                    row_deletable=True
+                    row_deletable=True, 
+                    selected_rows=selected_indicies
                 ), 
 
                 html.Div([
@@ -236,17 +239,18 @@ def register_callbacks(app):
         # current csv
         df_tasks = pd.read_csv(STUDENT_TASKS)
         df_student_tasks  = df_tasks[df_tasks['Student'] == student_name]
-        message = "test"
+        mdg_del = ""
+        msg_sel = ""
+                
         # update status of deleted rows in csv
         if len(df_student_tasks) > len(data):
-            message = save_deleted_changes(data, student_name)
+            msg_del = save_deleted_changes(data, student_name)
         
-
-        # print(selected_rows_ind)
-        # selected_rows_data = {data[i]['Task'] for i in selected_rows_ind}
-        # print('selected_rows', selected_rows_data)
-  
-        return message
+        # update status of selected rows in csv
+        if selected_rows_ind is not None:
+            selected_rows_data = [data[i] for i in selected_rows_ind]
+            msg_sel = save_checked_changes(selected_rows_data, student_name)
+        return str(msg_del + msg_sel)
 
 
 

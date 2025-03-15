@@ -189,18 +189,32 @@ def upcoming_deadlines():
     return df_upcoming.to_dict('records') 
 
 def student_deadlines(student):
-    """Retrieves the tasks in the deadlines CSV file for the given student. 
+    """Retrieves the tasks in the deadlines CSV file for the given student, keeping hidden or selected
+    rows consistent from previous session. 
     
     Returns:
     -------- 
-    list : A list of dictionaries containing tasks for the student. 
+    format_dict : list
+        A list of dictionaries containing tasks for the student.
+    selected_rows : list
+        A list of indicies of rows to display with check marks for completed tasks. 
+
     """
     df_tasks = pd.read_csv(STUDENT_TASKS)
     df_tasks_student = df_tasks[df_tasks['Student'] == student].copy()
     df_tasks_student['Due'] = pd.to_datetime(df_tasks_student['Due']).dt.strftime('%b %d')
+    
+    # display unhidden rows
     df_filter = df_tasks_student[df_tasks_student['Hidden'] != True]  
+
+    # keep previously selected rows checked 
+    df_filter_reset = df_filter.reset_index(drop=True)
+    selected_rows = df_filter_reset.index[df_filter_reset['Completed'] == True].tolist()
+
+    # format for displaying 
     df_format = df_filter[['Due', 'Task', 'Course', 'Teacher', 'Block']]
-    return df_format.to_dict('records')
+    format_dict = df_format.to_dict('records')
+    return format_dict, selected_rows
 
 def teacher_roster(teacher):
     """Retrieves the students in each of the teachers classes. 
@@ -291,20 +305,52 @@ def save_deleted_changes(data, student_name):
     """
     df_tasks = pd.read_csv(STUDENT_TASKS)
     df_student_tasks = df_tasks[df_tasks['Student'] == student_name]
-
-    for item in data:
-        item.pop('Due', None)
-
-    for index, row in df_student_tasks.iterrows():
+  
+    # find deleted rows 
+    data_compare = [{k: v for k, v in row.items() if k != 'Due'} for row in data] 
+    for ind, row in df_student_tasks.iterrows():
         row_dict = row[['Task', 'Course', 'Teacher', 'Block']].to_dict()
-        if row_dict not in data:
-            df_student_tasks.at[index, 'Hidden'] = True
+        if row_dict not in data_compare:
+            df_student_tasks.at[ind, 'Hidden'] = True
     
     # Save changes
-    print(df_student_tasks)
     df_tasks.update(df_student_tasks)
     df_tasks.to_csv(STUDENT_TASKS, index=False)
-    return "Data successfully saved."
+    return "Deleted changes saved successfully."
+
+def save_checked_changes(selected_rows_data, student_name):
+    """Updates student_tasks.csv to include changes to 'Completed' column when user checks
+    rows in student task table.
+    
+    Parameters
+    ----------
+    selected_rows_ind: list
+        A list of indicies of selected rows obtained from the the dash table.
+    
+    student_name: string  
+        The name of the students data to edit. 
+
+    Returns
+    -------
+    str: Verified message.  
+    """
+    df_tasks = pd.read_csv(STUDENT_TASKS)
+    df_student_tasks = df_tasks[df_tasks['Student'] == student_name].copy()
+
+    # handle unchecking
+    df_student_tasks['Completed'] = False
+
+    # find checked rows
+    data_compare = [{k: v for k, v in row.items() if k != 'Due'} for row in selected_rows_data] 
+    for ind, row in df_student_tasks.iterrows():
+        row_dict = row[['Task', 'Course', 'Teacher', 'Block']].to_dict()
+        if row_dict in data_compare:
+            df_student_tasks.at[ind, 'Completed'] = True
+    
+    # Save changes
+    df_tasks.update(df_student_tasks)
+    df_tasks.to_csv(STUDENT_TASKS, index=False)
+    return "Selected changes saved successfully."
 
 # FUNCTION CURRENTLY NOT BEING USED 
 def deadlines(course_name=None, teacher_name=None):
