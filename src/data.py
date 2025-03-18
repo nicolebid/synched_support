@@ -112,7 +112,7 @@ def save_workhabits_data(data, date):
     df_student = pd.read_csv(STUDENT_DATA)
     clean_data = []
     workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'Mostly On-task', '5':'On-task'}
-
+    
     for data_pt in data:
 
         # Set up
@@ -177,13 +177,13 @@ def upcoming_deadlines():
     
     Returns:
     -------- 
-    list : A list of dictionaries containing tasks due within 2 weeks. 
+    list : A list of dictionaries containing tasks due within 4 weeks. 
     """
     df = pd.read_csv(DEADLINES_DATA)
     df['Due'] = pd.to_datetime(df['Due'])
     today = datetime.datetime.today()
-    two_weeks = today + datetime.timedelta(weeks=2)
-    df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= two_weeks))].copy()
+    upcoming_weeks = today + datetime.timedelta(weeks=4)
+    df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= upcoming_weeks))].copy()
     df_upcoming = df_upcoming.sort_values(by='Due')
     df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%b %d')  
     return df_upcoming.to_dict('records') 

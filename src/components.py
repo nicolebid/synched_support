@@ -57,10 +57,10 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
 initial_attendance_graph = attendance_barchart()  
 initial_workhabit_graph = workhabit_timeline()
 initial_timespent_graph = timespent_barchart()
-initial_workhabit_data = [{"Student": "", "Workhabit Score": "", "Focus": "", "Support Attendance": ""}]
+initial_workhabit_data = [{'Student': '', 'Workhabit Score': '', 'Focus': '', 'Support Attendance': ''}]
 
 default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
-
+initial_deadlines_data = [{'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''}]
 # Student Tab 
 student_tab = dbc.Row([
     # COLUMN 1
@@ -314,6 +314,25 @@ task_tab = html.Div([
             # Task Deadlines - User input 
             html.Div([
                 html.H5("New Tasks", style={'marginBottom':'10px'}), 
+                # Table input
+                dag.AgGrid(
+                    id={'type': 'user-input', 'index': 'deadlines-table'}, 
+                    columnDefs=[
+                        {'headerName': 'Task', 'field': 'Task', 'editable': True, 'flex':3},
+                        {'headerName': 'Course', 'field': 'Course', 'editable': True, 'flex':3},
+                        {'headerName': 'Block', 'field': 'Block', 'editable': True, 'flex':1},
+                        {'headerName': 'Teacher', 'field': 'Teacher', 'editable': True, 'flex':3},
+                        {'headerName': 'Due', 'field': 'Due', 'editable': True, 'flex':1} 
+                    ], 
+                    rowData=initial_deadlines_data, 
+                    defaultColDef={"sortable": False, 
+                               "filter": False, 
+                               "resizable": False, 
+                               'wrapHeaderText': True, 
+                               'suppressMovable': True },
+                    style={'width': '100%', 'height':'150px'} 
+                ),
+
                 # Table Input - OLD 
                 # dash_table.DataTable(
                 #             id={'type': 'user-input', 'index': 'deadlines-table'},

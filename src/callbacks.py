@@ -281,6 +281,53 @@ def register_callbacks(app):
             msg = save_checked_changes(selected_rows_data, student_name)
         return msg
 
+    # Task Deadlines - User input
+    # Add row/submit data/append to csv/reset table
+    @app.callback(
+        [
+            Output({'type': 'user-input', 'index': 'deadlines-table'}, 'rowData'),
+            Output({'type': 'dynamic-output', 'index': 'output-msg-deadlines'}, 'children')    
+        ], 
+        [
+            Input({'type': 'dynamic-input', 'index': 'add-row-deadlines'}, 'n_clicks'),
+            Input({'type': 'dynamic-input', 'index': 'submit-deadlines'}, 'n_clicks'), 
+            Input({'type': 'user-input', 'index': 'deadlines-table'}, 'cellValueChanged')
+       ], 
+        State({'type': 'user-input', 'index': 'deadlines-table'}, 'rowData'),
+        prevent_initial_call=True
+    )
+    def update_deadlines_table(add_clicks, submit_clicks, cell_change, existing_data):
+        ctx = dash.callback_context
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
+
+        # add row
+        if 'add-row-deadlines' in triggered_id: 
+            existing_data.append({'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''})
+            return existing_data, ''
+        
+        # clear message when cell edited
+        if 'deadlines-table' in triggered_id and cell_change:
+            return dash.no_update, ''
+        
+        # save submitted data
+        elif 'submit-deadlines' in triggered_id:
+
+            cleaned_data = [row for row in existing_data if any(row.values())] 
+
+            if not cleaned_data:
+                return existing_data, 'No valid data to save.'
+
+            saved = save_deadlines_data(cleaned_data)
+           
+            # reset data
+            reset_data = [{'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''}]
+            return reset_data, saved
+        return existing_data, ''
+        
+
+
+
+
     # Task Deadlines - User input 
     # Add new row/submit data/append to csv/reset table - OLD 
     # @app.callback(
