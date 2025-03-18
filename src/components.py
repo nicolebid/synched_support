@@ -3,6 +3,7 @@ import dash.dcc as dcc
 import dash_bootstrap_components as dbc
 import datetime
 import pandas as pd 
+import dash_ag_grid as dag
 from collections import OrderedDict
 from dash import dash_table
 from .data import  student_list, upcoming_deadlines, save_workhabits_data
@@ -52,11 +53,12 @@ default_schedule = [{'Block': '1-1', 'Course': None, 'Teacher': None},
                     {'Block': '2-3', 'Course': None, 'Teacher': None},
                     {'Block': '2-4', 'Course': None, 'Teacher': None}]
 
+# Default values 
 initial_attendance_graph = attendance_barchart()  
 initial_workhabit_graph = workhabit_timeline()
 initial_timespent_graph = timespent_barchart()
+initial_workhabit_data = [{"Student": "", "Workhabit Score": "", "Focus": "", "Support Attendance": ""}]
 
-# Default values - task tab 
 default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
 
 # Student Tab 
@@ -194,7 +196,7 @@ student_tab = dbc.Row([
             }
         ),
       
-        # User Input - Student Workhabits
+        # Work Habit Data - User input 
         html.Div([
             html.Div([
                 html.H5("Daily Work Habits", style={'marginBottom':'10px'}), 
@@ -209,28 +211,24 @@ student_tab = dbc.Row([
             ), 
 
             # input table
-            dash_table.DataTable(
+            dag.AgGrid(
                 id={'type': 'user-input', 'index': 'workhabit-table'},
-                data=[{'Student': None, 'Workhabit Score': None, 'Focus': None, 'Support Attendance':None}], 
-                columns=[
-                    {"id": "Student", "name": "Student"},
-                    {"id": "Workhabit Score", "name": "Score"},
-                    {"id": "Focus", "name": "Focus"},
-                    {"id": "Support Attendance", "name": "Support Attendance"}
+                columnDefs=[
+                    {'headerName': 'Student', 'field': 'Student', 'editable': True, 'flex': 3},
+                    {'headerName': 'Workhabit Score', 'field': 'Workhabit Score', 'editable': True, 'flex': 2},
+                    {'headerName': 'Focus', 'field': 'Focus', 'editable': True, 'flex': 3},
+                    {'headerName': 'Support Attendance', 'field': 'Support Attendance', 'editable': True, 'flex': 2}
                 ],
-                editable=True,
-                row_deletable=True,
-                style_table={'overflowX': 'visible', 'minWidth':'100%'},
-                style_cell={'textAlign': 'left', 'overflow': 'visible'},
-                style_data_conditional=[
-                    {'if': {'column_id': 'Student'}, 'width': '33%'}, 
-                    {'if': {'column_id': 'Focus'}, 'width': '33%'}, 
-                    {'if': {'column_id': 'Workhabit Score'}, 'width': '10%'},  
-                    {'if': {'column_id': 'Support Attendance'}, 'width': '14%'}, 
-                ],
-                    style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
-            ), 
-            # Buttons for adding rows/submitting data
+                rowData=initial_workhabit_data, 
+                defaultColDef={"sortable": False, 
+                               "filter": False, 
+                               "resizable": False, 
+                               'wrapHeaderText': True, 
+                               'suppressMovable': True },
+                style={'width': '100%', 'height':'150px'} 
+            ),
+
+            # Button - add row/submit data
             html.Div([
                 dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0, style={'marginRight':'10px'}),
                 dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0)
@@ -313,34 +311,36 @@ task_tab = html.Div([
                 'minHeight': '20vh'
             }),
 
-            # User Input - Deadlines 
+            # Task Deadlines - User input 
             html.Div([
                 html.H5("New Tasks", style={'marginBottom':'10px'}), 
-                # Table Input
-                dash_table.DataTable(
-                            id={'type': 'user-input', 'index': 'deadlines-table'},
-                            data=[{'Task': None, 'Course': None, 'Block': None, 'Teacher':None, 'Due': None}], 
-                            columns=[ 
-                                {"id": "Task", "name": "Task"},
-                                {"id": "Course", "name": "Course"},
-                                {"id": "Block", "name": "Block"},
-                                {"id": "Teacher", "name": "Teacher"},
-                                {"id": "Due", "name": "Due"}
-                            ],
-                            editable=True,
-                            row_deletable=True,
-                            style_table={'overflowX': 'visible', 'minWidth':'100%'},
-                            style_cell={'textAlign': 'left', 'overflow': 'visible'},
-                            style_data_conditional=[
-                                {'if': {'column_id': 'Task'}, 'width': '30%'}, 
-                                {'if': {'column_id': 'Course'}, 'width': '15%'}, 
-                                {'if': {'column_id': 'Block'}, 'width': '10%'},  
-                                {'if': {'column_id': 'Teacher'}, 'width': '25%'}, 
-                                {'if': {'column_id': 'Due'}, 'width': '20%'} 
+                # Table Input - OLD 
+                # dash_table.DataTable(
+                #             id={'type': 'user-input', 'index': 'deadlines-table'},
+                #             data=[{'Task': None, 'Course': None, 'Block': None, 'Teacher':None, 'Due': None}], 
+                #             columns=[ 
+                #                 {"id": "Task", "name": "Task"},
+                #                 {"id": "Course", "name": "Course"},
+                #                 {"id": "Block", "name": "Block"},
+                #                 {"id": "Teacher", "name": "Teacher"},
+                #                 {"id": "Due", "name": "Due"}
+                #             ],
+                #             editable=True,
+                #             row_deletable=True,
+                #             style_table={'overflowX': 'visible', 'minWidth':'100%'},
+                #             style_cell={'textAlign': 'left', 'overflow': 'visible'},
+                #             style_data_conditional=[
+                #                 {'if': {'column_id': 'Task'}, 'width': '30%'}, 
+                #                 {'if': {'column_id': 'Course'}, 'width': '15%'}, 
+                #                 {'if': {'column_id': 'Block'}, 'width': '10%'},  
+                #                 {'if': {'column_id': 'Teacher'}, 'width': '25%'}, 
+                #                 {'if': {'column_id': 'Due'}, 'width': '20%'} 
 
-                            ],        
-                            style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
-                        ),
+                #             ],        
+                #             style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
+                #         ),
+
+                        # Button - add row/submit data
                         html.Div([
                             dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px'}),
                             dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0)

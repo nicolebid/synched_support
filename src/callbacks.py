@@ -123,41 +123,52 @@ def register_callbacks(app):
                 return "Note saved.", 0 
         return '', 0 
     
-    # WORKHABIT DATA (user input)
-    # Add new row/submit data/append to csv/reset table 
+    # Work Habit Data - User input 
     @app.callback(
         [
-            Output({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
-            Output({'type': 'dynamic-output', 'index': 'output-msg'}, "children")    
-        ], 
+            Output({'type': 'user-input', 'index': 'workhabit-table'}, 'rowData'),
+            Output({'type': 'dynamic-output', 'index': 'output-msg'}, 'children')
+        ],
         [
-            Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, "n_clicks"),
-            Input({'type': 'dynamic-input', 'index': 'submit-btn'}, "n_clicks"), 
-            Input({'type':'dynamic-input','index':'date-picker'}, 'date')
-        ], 
-        State({'type': 'user-input', 'index': 'workhabit-table'}, "data"),
+            Input({'type': 'dynamic-input', 'index': 'add-row-btn'}, 'n_clicks'),
+            Input({'type': 'dynamic-input', 'index': 'submit-btn'}, 'n_clicks'),
+            Input({'type': 'dynamic-input', 'index': 'date-picker'}, 'date'),
+            Input({'type': 'user-input', 'index': 'workhabit-table'}, 'cellValueChanged')
+        ],
+        State({'type': 'user-input', 'index': 'workhabit-table'}, 'rowData'),
         prevent_initial_call=True
     )
-
-    def update_table(add_clicks, submit_clicks, date, existing_data):
+    def update_table(add_clicks, submit_clicks, date, cell_changed, existing_data):
         ctx = dash.callback_context
-        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
-        
-        # add blank row when clicked
-        if 'add-row-btn' in triggered_id: 
-            existing_data.append({"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""})
-            return existing_data, ""
-        
-        # save submitted data
-        elif 'submit-btn' in triggered_id:
-            saved = save_workhabits_data(existing_data, date)
-           
-            # reset data
-            reset_data = [{"Student": "", "Workhabit Score": "", "Worked On": "", "Support Attendance": ""}]
-            return reset_data, saved
-        return existing_data, ""
-   
+        if not ctx.triggered:
+            return existing_data, ''
 
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        # Clear message when a cell is edited
+        if 'workhabit-table' in triggered_id and cell_changed:
+            return dash.no_update, ''
+
+        # Add blank row when clicked
+        if 'add-row-btn' in triggered_id:
+            existing_data.append({'Student': '', 'Workhabit Score': '', 'Focus': '', 'Support Attendance': ''})
+            return existing_data, ''
+
+        # Save submitted data
+        elif 'submit-btn' in triggered_id:
+    
+            cleaned_data = [row for row in existing_data if any(row.values())] # remove empty rows
+            
+            # error message for no valid data 
+            if not cleaned_data:
+                return existing_data, 'No valid data to save.'
+            
+            saved_message = save_workhabits_data(cleaned_data, date)
+            reset_data = [{'Student': '', 'Workhabit Score': '', 'Focus': '', 'Support Attendance': ''}]
+            return reset_data, saved_message
+
+        return existing_data, ''
+      
     # TAB 2
     # Update 2nd Dropdown when first dropdown is selected
     @app.callback(
@@ -270,38 +281,38 @@ def register_callbacks(app):
             msg = save_checked_changes(selected_rows_data, student_name)
         return msg
 
-    # DEADLINES DATA (user input)
-    # Add new row/submit data/append to csv/reset table 
-    @app.callback(
-        [
-            Output({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
-            Output({'type': 'dynamic-output', 'index': 'output-msg-deadlines'}, "children")    
-        ], 
-        [
-            Input({'type': 'dynamic-input', 'index': 'add-row-deadlines'}, "n_clicks"),
-            Input({'type': 'dynamic-input', 'index': 'submit-deadlines'}, "n_clicks"), 
-       ], 
-        State({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
-        prevent_initial_call=True
-    )
+    # Task Deadlines - User input 
+    # Add new row/submit data/append to csv/reset table - OLD 
+    # @app.callback(
+    #     [
+    #         Output({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
+    #         Output({'type': 'dynamic-output', 'index': 'output-msg-deadlines'}, "children")    
+    #     ], 
+    #     [
+    #         Input({'type': 'dynamic-input', 'index': 'add-row-deadlines'}, "n_clicks"),
+    #         Input({'type': 'dynamic-input', 'index': 'submit-deadlines'}, "n_clicks"), 
+    #    ], 
+    #     State({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
+    #     prevent_initial_call=True
+    # )
 
-    def update_table(add_clicks, submit_clicks, existing_data):
-        ctx = dash.callback_context
-        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
+    # def update_table(add_clicks, submit_clicks, existing_data):
+    #     ctx = dash.callback_context
+    #     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
         
-        # add blank row when clicked
-        if 'add-row-deadlines' in triggered_id: 
-            existing_data.append({"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""})
-            return existing_data, ""
+    #     # add blank row when clicked
+    #     if 'add-row-deadlines' in triggered_id: 
+    #         existing_data.append({"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""})
+    #         return existing_data, ""
         
-        # save submitted data
-        elif 'submit-deadlines' in triggered_id:
-            saved = save_deadlines_data(existing_data)
+    #     # save submitted data
+    #     elif 'submit-deadlines' in triggered_id:
+    #         saved = save_deadlines_data(existing_data)
            
-            # reset data
-            reset_data = [{"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""}]
-            return reset_data, saved
-        return existing_data, ""
+    #         # reset data
+    #         reset_data = [{"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""}]
+    #         return reset_data, saved
+    #     return existing_data, ""
    
 
 
