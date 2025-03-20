@@ -6,7 +6,7 @@ import datetime
 import os
 from dash.dependencies import Input, Output, State
 from dash import dash_table
-from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes, save_checked_changes
+from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes, save_checked_changes, workhabit_trend
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
@@ -14,7 +14,7 @@ from .config import *
 
 def register_callbacks(app):
 
-    # Opening about popup
+    # About pop-up
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'about-modal'}, 'is_open'),
         Input({'type': 'button', 'index': 'open-modal'}, 'n_clicks'),
@@ -47,7 +47,22 @@ def register_callbacks(app):
             return student_schedule(selected_student)
         return default_schedule
 
-    # Updating attendance graph based on student and graph type 
+    # Update Work habit card
+    @app.callback(
+        [
+            Output({'type': 'dynamic-output', 'index': 'work-habit-message'}, 'children'),
+            Output({'type': 'dynamic-output', 'index': 'work-habit-icon'}, 'children'), 
+            Output({'type': 'dynamic-output', 'index': 'work-habit-avg'}, 'children')
+        ],
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')
+    )
+    def update_workhabit_card(selected_student):
+        if selected_student:
+            message, avg, icon = workhabit_trend(selected_student)         
+            return message, icon, avg
+        return "Select a student", "", ""
+
+    # Update attendance graph based on student and graph type 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'attendance-graph'}, 'figure'), 
         [
@@ -323,45 +338,3 @@ def register_callbacks(app):
             reset_data = [{'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''}]
             return reset_data, saved
         return existing_data, ''
-        
-
-
-
-
-    # Task Deadlines - User input 
-    # Add new row/submit data/append to csv/reset table - OLD 
-    # @app.callback(
-    #     [
-    #         Output({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
-    #         Output({'type': 'dynamic-output', 'index': 'output-msg-deadlines'}, "children")    
-    #     ], 
-    #     [
-    #         Input({'type': 'dynamic-input', 'index': 'add-row-deadlines'}, "n_clicks"),
-    #         Input({'type': 'dynamic-input', 'index': 'submit-deadlines'}, "n_clicks"), 
-    #    ], 
-    #     State({'type': 'user-input', 'index': 'deadlines-table'}, "data"),
-    #     prevent_initial_call=True
-    # )
-
-    # def update_table(add_clicks, submit_clicks, existing_data):
-    #     ctx = dash.callback_context
-    #     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
-        
-    #     # add blank row when clicked
-    #     if 'add-row-deadlines' in triggered_id: 
-    #         existing_data.append({"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""})
-    #         return existing_data, ""
-        
-    #     # save submitted data
-    #     elif 'submit-deadlines' in triggered_id:
-    #         saved = save_deadlines_data(existing_data)
-           
-    #         # reset data
-    #         reset_data = [{"Task": "", "Course": "", "Block": "", "Teacher": "", "Due":""}]
-    #         return reset_data, saved
-    #     return existing_data, ""
-   
-
-
-        
-    

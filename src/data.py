@@ -1,5 +1,6 @@
 import pandas as pd
 import datetime
+import math
 from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE, ATTEND_DATA, STUDENT_TASKS
 import os
 
@@ -35,6 +36,65 @@ def student_schedule(student_name):
     schedule = df_student[['Block', 'Course', 'Teacher' ]]
     schedule = schedule.sort_values(by='Block')
     return schedule.to_dict('records')
+
+def workhabit_trend(student_name):
+    """Calculuate trend in given student's work habit score over the past 6 days, and provides a message
+    describing the increase, decrease or consistency in their worhabits. 
+    
+    Parameters
+    ----------
+    student_name: str
+        The name of the student to determine the workhabit trend for. 
+    
+    Returns
+    -------
+    message: str
+        The description of the students trend in work habits over the past 6 classes. 
+    
+    recent_avg: np.float
+        The student's average work habit score for their 3 most recent classes. 
+    """
+    # set up data
+    workhabit_scores = {'Off-task': 0, 'Mostly Off-task': 1,'Equally On/Off-task': 2, 'Mostly On-task': 3,'On-task': 4}
+    df_workhabits = pd.read_csv(ATTEND_DATA)
+    df_student = df_workhabits[df_workhabits['Student'] == student_name]
+    df_student = df_student[df_student['Course'].str.contains('Support', regex=True)]
+    df_student = df_student[df_student['Habit'].notna()]
+    df_student['Score'] = df_student['Habit'].apply(lambda x: workhabit_scores.get(x))
+    df_student.sort_values(by='Date', ascending=False, inplace=True)
+
+    # Check if enougth data exists
+    if len(df_student) < 5:
+       return "More data needed.", None, ""
+
+    # Calculate percent change
+    recent = df_student.head(3)
+    recent_avg = float(recent['Score'].mean())
+    previous = df_student.iloc[3:6]
+    previous_avg = float(previous['Score'].mean())
+    per_change = round(((recent_avg - previous_avg)/previous_avg)*100, 1)
+    mag_change = abs(per_change)
+  
+    # provide a message 
+    if math.isclose(mag_change, 0, abs_tol=1e-5):
+       return "Consistent", round(recent_avg,1) , "🔁" 
+   
+    if mag_change > 0 and mag_change <= 5:
+        mag = "Small"
+    elif mag_change > 5 and mag_change <= 10:
+       mag = "Moderate"
+    elif mag_change > 10:
+       mag = "Large"
+
+    if per_change > 0:
+      trend = "increase"
+      icon = "✅"
+    else:
+      trend = "decrease"
+      icon = "⚠️"
+
+    message = mag + ' ' + trend 
+    return message, round(recent_avg,1), icon  
 
 def get_student_note(student_name):
     """Retrieves the note from the CSV file for the given student.
@@ -111,7 +171,7 @@ def save_workhabits_data(data, date):
     """
     df_student = pd.read_csv(STUDENT_DATA)
     clean_data = []
-    workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'Mostly On-task', '5':'On-task'}
+    workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'On-task'}
     
     for data_pt in data:
 

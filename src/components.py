@@ -61,6 +61,7 @@ initial_workhabit_data = [{'Student': '', 'Workhabit Score': '', 'Focus': '', 'S
 
 default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
 initial_deadlines_data = [{'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''}]
+
 # Student Tab 
 student_tab = dbc.Row([
     # COLUMN 1
@@ -71,7 +72,7 @@ student_tab = dbc.Row([
             options=student_list(), 
             value='A', 
             placeholder='Select a student...', 
-            style={'marginBottom': '30px'} 
+            style={'marginBottom': '20px'} 
         ),  
         # Student Schedule 
         html.Div([
@@ -85,7 +86,7 @@ student_tab = dbc.Row([
                 ],
                 data=default_schedule, 
                 style_cell={'textAlign':'left', 'fontSize':'14px'}, 
-                style_header={'fontWeight': 'bold'}                           
+                style_header={'fontWeight': 'bold'}                         
             )
         ], 
         style={
@@ -93,12 +94,80 @@ student_tab = dbc.Row([
                 'border-radius': '8px', 
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding':'15px', 
-                'marginBottom': '20px', 
+                'marginBottom': '25px', 
                 'flex-grow': '1', 
                 'height': '35vh', 
-                'min-height': '325px'
+                'min-height': '335px'
         }
         ),
+        # Work habit Cards 
+        html.Div(
+            dbc.Row(
+                [
+                    dbc.Col(
+                        dbc.Card(
+                            [
+                                dbc.CardHeader("6-day Trend",  style={'textAlign': 'center'}),
+                                dbc.CardBody(
+                                    [
+                                        html.H1("", 
+                                                id={'type': 'dynamic-output', 'index': 'work-habit-icon'}, 
+                                                style={'textAlign': 'center'}),                                     
+                                        html.H5(
+                                            "Select a student",
+                                            id={"type": "dynamic-output", "index": "work-habit-message"},
+                                            className="card-title", 
+                                            style={'textAlign': 'center'}
+                                        ),
+
+                                    ]
+                                ),
+                            ],
+                            outline=True,
+                            style={
+                                "border": "2px solid #387c9f",
+                                "border-radius": "8px",
+                                "box-shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
+                            }
+                        ),
+                        width=6  
+                    ),
+              
+                    dbc.Col(
+                        dbc.Card(
+                            [
+                                dbc.CardHeader("Current Average",  style={'textAlign': 'center'}),
+                                dbc.CardBody(
+                                    [
+                                        html.H1("AVG",
+                                                id={'type': 'dynamic-output', 'index': 'work-habit-avg'},
+                                                style={'textAlign':'center'},
+                                                className="card-title"),
+                                        html.H5('Out of 5',  style={'textAlign':'center'})
+                                    ]
+                                ),
+                            ],
+                            outline=True,
+                            style={
+                                "border": "2px solid #387c9f",  
+                                "border-radius": "8px",
+                                "box-shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
+                            }
+                        ),
+                        width=6  
+                    )
+                ],
+                className="g-3"  
+            )
+        )
+
+
+
+
+
+
+
+
 
     ], width=3), 
     # COLUMN 2 
@@ -333,43 +402,17 @@ task_tab = html.Div([
                     style={'width': '100%', 'height':'150px'} 
                 ),
 
-                # Table Input - OLD 
-                # dash_table.DataTable(
-                #             id={'type': 'user-input', 'index': 'deadlines-table'},
-                #             data=[{'Task': None, 'Course': None, 'Block': None, 'Teacher':None, 'Due': None}], 
-                #             columns=[ 
-                #                 {"id": "Task", "name": "Task"},
-                #                 {"id": "Course", "name": "Course"},
-                #                 {"id": "Block", "name": "Block"},
-                #                 {"id": "Teacher", "name": "Teacher"},
-                #                 {"id": "Due", "name": "Due"}
-                #             ],
-                #             editable=True,
-                #             row_deletable=True,
-                #             style_table={'overflowX': 'visible', 'minWidth':'100%'},
-                #             style_cell={'textAlign': 'left', 'overflow': 'visible'},
-                #             style_data_conditional=[
-                #                 {'if': {'column_id': 'Task'}, 'width': '30%'}, 
-                #                 {'if': {'column_id': 'Course'}, 'width': '15%'}, 
-                #                 {'if': {'column_id': 'Block'}, 'width': '10%'},  
-                #                 {'if': {'column_id': 'Teacher'}, 'width': '25%'}, 
-                #                 {'if': {'column_id': 'Due'}, 'width': '20%'} 
-
-                #             ],        
-                #             style_header={'white-space': 'normal', 'word-wrap': 'break-word','text-align': 'center', 'fontWeight': 'bold'}                                     
-                #         ),
-
-                        # Button - add row/submit data
-                        html.Div([
-                            dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px'}),
-                            dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0)
-                        ], style={
-                            'display': 'flex',
-                            'justifyContent': 'flex-end',  
-                            'marginTop': '10px'} 
-                        ),
-                        # Output message
-                        html.Div(id={'index':'output-msg-deadlines','type':'dynamic-output'}) 
+                # Button - add row/submit data
+                html.Div([
+                    dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px'}),
+                    dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0)
+                ], style={
+                    'display': 'flex',
+                    'justifyContent': 'flex-end',  
+                    'marginTop': '10px'} 
+                ),
+                # Output message
+                html.Div(id={'index':'output-msg-deadlines','type':'dynamic-output'}) 
                       
             ], style={
                 'border': '2px solid #387c9f',
