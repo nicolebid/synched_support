@@ -60,7 +60,7 @@ def register_callbacks(app):
         if selected_student:
             message, avg, icon = workhabit_trend(selected_student)         
             return message, icon, avg
-        return "Select a student", "", ""
+        return "Trend", "∅", "∅"
 
     # Update attendance graph based on student and graph type 
     @app.callback(

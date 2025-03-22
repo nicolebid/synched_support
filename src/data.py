@@ -65,7 +65,7 @@ def workhabit_trend(student_name):
 
     # Check if enougth data exists
     if len(df_student) < 5:
-       return "More data needed.", None, ""
+       return "More data needed.", "∅", "∅"
 
     # Calculate percent change
     recent = df_student.head(3)
@@ -87,10 +87,10 @@ def workhabit_trend(student_name):
        mag = "Large"
 
     if per_change > 0:
-      trend = "increase"
+      trend = "Increase"
       icon = "✅"
     else:
-      trend = "decrease"
+      trend = "Decrease"
       icon = "⚠️"
 
     message = mag + ' ' + trend 

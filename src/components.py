@@ -101,7 +101,8 @@ student_tab = dbc.Row([
         }
         ),
         # Work habit Cards 
-        html.Div(
+        html.Div([
+            html.H5("Work Habit Insights", style={'marginBottom':'20px'}),
             dbc.Row(
                 [
                     dbc.Col(
@@ -114,7 +115,7 @@ student_tab = dbc.Row([
                                                 id={'type': 'dynamic-output', 'index': 'work-habit-icon'}, 
                                                 style={'textAlign': 'center'}),                                     
                                         html.H5(
-                                            "Select a student",
+                                            "Trend",
                                             id={"type": "dynamic-output", "index": "work-habit-message"},
                                             className="card-title", 
                                             style={'textAlign': 'center'}
@@ -124,11 +125,7 @@ student_tab = dbc.Row([
                                 ),
                             ],
                             outline=True,
-                            style={
-                                "border": "2px solid #387c9f",
-                                "border-radius": "8px",
-                                "box-shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
-                            }
+                            style={'min-height': '165px'}
                         ),
                         width=6  
                     ),
@@ -143,31 +140,28 @@ student_tab = dbc.Row([
                                                 id={'type': 'dynamic-output', 'index': 'work-habit-avg'},
                                                 style={'textAlign':'center'},
                                                 className="card-title"),
-                                        html.H5('Out of 5',  style={'textAlign':'center'})
+                                        html.H5('Out of 4',  style={'textAlign':'center'})
                                     ]
                                 ),
                             ],
                             outline=True,
-                            style={
-                                "border": "2px solid #387c9f",  
-                                "border-radius": "8px",
-                                "box-shadow": "0 4px 8px rgba(0, 0, 0, 0.1)"
-                            }
+                            style={'min-height': '165px'}
                         ),
                         width=6  
                     )
                 ],
                 className="g-3"  
-            )
+            )],
+            style={
+                'border': '2px solid #387c9f',
+                'border-radius': '8px', 
+                'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                'padding':'15px', 
+                'flex-grow': '1', 
+                'min-height': '255px'
+        } 
+
         )
-
-
-
-
-
-
-
-
 
     ], width=3), 
     # COLUMN 2 
@@ -254,7 +248,7 @@ student_tab = dbc.Row([
                 id={'type': 'dynamic-output', 'index': 'attendance-graph'},
                 figure=initial_attendance_graph,
                 config={'displayModeBar': False},
-                style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'} 
+                style={'flex-grow': '1', 'height': '35vh', 'min-height': '325px'}  # Adjust height to fit in user input 
             )
         ], 
             style={'border': '2px solid #387c9f',
@@ -285,7 +279,7 @@ student_tab = dbc.Row([
                 columnDefs=[
                     {'headerName': 'Student', 'field': 'Student', 'editable': True, 'flex': 3},
                     {'headerName': 'Workhabit Score', 'field': 'Workhabit Score', 'editable': True, 'flex': 2},
-                    {'headerName': 'Focus', 'field': 'Focus', 'editable': True, 'flex': 3},
+                    {'headerName': 'Subject Focus', 'field': 'Focus', 'editable': True, 'flex': 3},
                     {'headerName': 'Support Attendance', 'field': 'Support Attendance', 'editable': True, 'flex': 2}
                 ],
                 rowData=initial_workhabit_data, 
@@ -316,7 +310,7 @@ student_tab = dbc.Row([
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding':'10px',
                 'overflow': 'visible'                             
-            }
+            }                                                                   # adjust height to fit in with attendance graph 
         )                           
     ], 
         width=4
@@ -362,7 +356,12 @@ task_tab = html.Div([
                     style_cell={'textAlign':'center'}, 
                     style_header={'fontWeight': 'bold'}, 
                 )
-            ], style={'border': '2px solid #387c9f', 'border-radius': '8px', 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 'padding':'10px' })
+            ], style={'border': 
+                      '2px solid #387c9f', 
+                      'border-radius': '8px', 
+                      'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                      'padding':'10px', 
+                      'minHeight': '57vh'})
         ], style={'flex': '1', 'padding': '10px'}
         ),
              
@@ -377,7 +376,7 @@ task_tab = html.Div([
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding': '10px', 
                 'marginBottom': '10px', 
-                'minHeight': '20vh'
+                'minHeight': '35vh'
             }),
 
             # Task Deadlines - User input 
@@ -420,7 +419,7 @@ task_tab = html.Div([
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding': '10px', 
                 'marginBottom': '20px', 
-                'minHeight': '20vh'
+                'minHeight': '35vh'
             }),
 
         ], style={
@@ -434,7 +433,6 @@ task_tab = html.Div([
     )
 
 ])
-
 
 # FOOTER
 footer_info = [
