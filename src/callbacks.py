@@ -73,31 +73,23 @@ def register_callbacks(app):
     def update_attendance_bar_chart(selected_graph, selected_student):
         if not selected_student:
             return attendance_barchart()
-        if selected_graph == 'overall-attend':
-            return attendance_barchart(selected_student, True)
-        elif selected_graph == 'course-attend':
+        if selected_graph:
             return attendance_barchart(selected_student, False)
-        return attendance_barchart()
+        else:
+            return attendance_barchart(selected_student, True)
         
     # Updating timeline/barchart graph based on student and graph selection 
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'graph-output'}, 'figure'),
         [Input({'type': 'dynamic-input', 'index': 'graph-toggle'}, 'value'),
-        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')], 
+        Input({'type': 'dynamic-input', 'index': 'student-select'}, 'value')],
     )
-    def update_graph(selected_graph, selected_student):
-        if selected_student:
-            if selected_graph == 'timeline':
-                return workhabit_timeline(selected_student)  
-            else:
-                return timespent_barchart(selected_student)  
-        else:
-            # return default graphs 
-            if selected_graph == 'timeline':
-                return workhabit_timeline(selected_student)
-            else:
-                return timespent_barchart(selected_student)
-    
+    def update_graph(selected_graph, selected_student):      
+        if selected_graph:  
+            return timespent_barchart(selected_student)
+        else:  
+            return workhabit_timeline(selected_student)
+
     # Update Notes when student is selected
     @app.callback(
         Output({'type': 'note-input', 'index': 'teacher-notes'}, 'value'), 
