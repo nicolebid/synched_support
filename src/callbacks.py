@@ -103,7 +103,7 @@ def register_callbacks(app):
             student_note = get_student_note(student_selected)
             if student_note:
                 return student_note
-            return f"Type your notes for {student_selected} here..."
+            return f"Type notes for {student_selected} here..."
 
     # Update student notes in CSV when save is clicked
     @app.callback(
@@ -213,7 +213,7 @@ def register_callbacks(app):
             table_data, selected_indicies = student_deadlines(name)
 
             return html.Div([
-                html.H5(f'{name} - Tasks'),
+                html.H6(f'{name} - Tasks'),
                 dash_table.DataTable(
                     id={'type':'dynamic-input', 'index':'student-task-table'}, 
                     columns=[{'name':'Due', 'id':'Due'}, 
@@ -222,21 +222,25 @@ def register_callbacks(app):
                              {'name':'Teacher', 'id':'Teacher'}, 
                              {'name':'Block', 'id':'Block'}], 
                     data=table_data,
-                    style_cell={'textAlign':'center'},
-                    style_header={'fontWeight': 'bold'}, 
+                    style_cell={'textAlign':'center', 'fontSize':'0.7rem'}, 
+                    style_header={'fontWeight': 'bold', 'textAlign':'center'},                  
                     row_selectable='multi', 
                     row_deletable=True, 
                     selected_rows=selected_indicies
                 ), 
-
                 html.Div([
                     # Output message
-                    html.Div(id={'type':'dynamic-output','index':'output-student-task'}),
+                    html.Div(id={'type':'dynamic-output','index':'output-student-task'}, style={'marginRight':'10px','fontSize':'0.7rem'}),
 
                     # Save button
                     dbc.Button('Save', id={'type': 'dynamic-input', 'index': 'save-student-tasks'}, n_clicks=0, 
-                            style={'marginTop': '10px'})
-                ], style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'flex-end'})     
+                            style={'marginTop': '10px','fontSize':'0.7rem'})
+                ], style={
+                    'display': 'flex',
+                    'justifyContent': 'flex-end',  
+                    'marginTop': '10px', 
+                    'alignItems': 'center'
+                })     
             ])
 
         elif role == 'Teacher' and name: 
@@ -248,20 +252,19 @@ def register_callbacks(app):
                 columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
                 data=[{col: '\n'.join(map(str, students)) for col, students in teacher_task_dict.items()},
                     {col: '\n'.join(map(str, students)) for col, students in teacher_roster_dict.items()}],
-                style_cell={'padding': '10px', 'textAlign': 'center'},
                 style_data={'whiteSpace': 'pre-line'},
-                style_header={'fontWeight': 'bold'}
+                style_cell={'textAlign':'center', 'fontSize':'0.7rem'}, 
+                style_header={'fontWeight': 'bold', 'textAlign':'center'},  
             )
             ])
         else:
             return html.Div([
-                html.H5('Tasks'), 
+                html.H6('Tasks'), 
                 dash_table.DataTable(
                     id='default-table',
                     columns=[{'name': '', 'id': ''}, {'name': '', 'id': ''}, {'name': '', 'id': ''}],
                     data=task_default_df.to_dict('records'),
-                    style_table={'height': '200px', 'width': '100%'
-                    },
+                    style_table={'height': '200px', 'width': '100%'},
                 )
             ])
     @app.callback(

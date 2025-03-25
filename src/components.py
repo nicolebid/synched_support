@@ -186,7 +186,7 @@ student_tab = dbc.Row([
         } 
         )
 
-    ], width=3,style={'height':'100vh'}), 
+    ], width=3,style={'display': 'flex','flex-direction': 'column'}), 
     # COLUMN 2 
     dbc.Col([
         # Workhabits Graphs 
@@ -229,13 +229,24 @@ student_tab = dbc.Row([
                 placeholder='Type your notes here...', 
                 style={'width':'100%', 'fontSize':'0.8rem', 'height':'100%'}
             ), 
-            dbc.Button(
-                'Save', 
-                id={'type': 'dynamic-input', 'index': 'save-note-button'},
-                n_clicks=0, 
-                style={'margin-left': 'auto', 'marginTop':'10px', 'fontSize':'0.7rem'}), 
-            # Output message
-            html.Div(id={'type':'dynamic-output','index':'output-msg-note'})  
+           html.Div([
+               # Output message
+                html.Div(id={'type':'dynamic-output','index':'output-msg-note'}, 
+                        style={'fontSize':'0.7rem', 'marginTop':'10px', 'marginRight':'10px'}),
+                dbc.Button(
+                    'Save', 
+                    id={'type': 'dynamic-input', 'index': 'save-note-button'},
+                    n_clicks=0, 
+                    style={'fontSize':'0.7rem', 'marginTop':'10px'} 
+                ),   
+            ], 
+            style={
+                'display': 'flex',               
+                'justifyContent': 'flex-end',      
+                'alignItems': 'center',            
+                'width': '100%', 
+                'marginLeft':'auto'                  
+            })
         ],  
             style={
                 'border': '2px solid #387c9f',
@@ -248,7 +259,7 @@ student_tab = dbc.Row([
                 'height':'35.5vh' 
             } 
         )
-    ], width=5),
+    ], width=5, style={'display': 'flex', 'flex-direction': 'column'}),
 
     # COLUMN 3
     dbc.Col([
@@ -303,32 +314,38 @@ student_tab = dbc.Row([
             dag.AgGrid(
                 id={'type': 'user-input', 'index': 'workhabit-table'},
                 columnDefs=[
-                    {'headerName': 'Student', 'field': 'Student', 'editable': True, 'flex': 3},
-                    {'headerName': 'Workhabit Score', 'field': 'Workhabit Score', 'editable': True, 'flex': 2},
-                    {'headerName': 'Subject Focus', 'field': 'Focus', 'editable': True, 'flex': 3},
-                    {'headerName': 'Support Attendance', 'field': 'Support Attendance', 'editable': True, 'flex': 2}
+                    {'headerName': 'Student', 'field': 'Student', 'editable': True, 'flex': 1},
+                    {'headerName': 'WH Score', 'field': 'Workhabit Score', 'editable': True, 'flex': 1},
+                    {'headerName': 'Subject Focus', 'field': 'Focus', 'editable': True, 'flex': 1},
+                    {'headerName': 'Attendance', 'field': 'Support Attendance', 'editable': True, 'flex': 1}
                 ],
                 rowData=initial_workhabit_data, 
-                defaultColDef={"sortable": False, 
-                               "filter": False, 
-                               "resizable": False, 
+                defaultColDef={'sortable': False, 
+                               'filter': False, 
+                               'resizable': False, 
                                'wrapHeaderText': True, 
-                               'suppressMovable': True },
-                style={'width': '100%', 'height':'150px'} 
+                               'suppressMovable': True, 
+                               'cellStyle': {'fontSize': '0.7rem'},
+                               "autoHeaderHeight": True,
+                },
+                style={'width': '100%', 'height':'150px'}, 
             ),
 
             # Button - add row/submit data
             html.Div([
+                # Output message
+                html.Div(id={'index':'output-msg','type':'dynamic-output'}, style={'fontSize':'0.7rem', 'marginRight':'10px'}),
                 dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-btn'}, n_clicks=0, style={'marginRight':'10px', 'marginTop':'10px', 'fontSize':'0.7rem'}),
                 dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-btn'}, n_clicks=0, style={'marginTop':'10px', 'fontSize':'0.7rem'})
             ], 
                 style={
-                    'display': 'flex',
-                    'justifyContent': 'flex-end',  
-                } 
+                    'display': 'flex',               
+                    'justifyContent': 'flex-end',      
+                    'alignItems': 'center',            
+                    'width': '100%', 
+                    'marginLeft':'auto'                  
+                }
             ),
-            # Output message
-            html.Div(id={'index':'output-msg','type':'dynamic-output', 'fontSize':'0.7rem'})
         ], 
             style={
                 'border': '2px solid #387c9f', 
@@ -337,21 +354,19 @@ student_tab = dbc.Row([
                 'padding':'10px',
                 'overflow': 'visible'                             
             }                             
-        )                           
+        ),                           
     ], 
-        width=4
-    ),  
-
+        width=4, style={'flex-direction': 'column'}
+    )
 ],
 class_name='g-2',
-    style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'0.5rem', 'width': '100%'}
+style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'0.5rem', 'width': '100%'}
 )
 
 # Task Tab 
-task_tab = html.Div([
-    html.Div([
+task_tab = dbc.Row([
         # COLUMN 1 
-        html.Div([
+        dbc.Col([
             # Teacher/Course Selection
             dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': 'select-type'},
@@ -359,17 +374,17 @@ task_tab = html.Div([
                     {'label': 'Student', 'value': 'Student'},
                     {'label': 'Teacher', 'value': 'Teacher'}
                 ],
-                placeholder='Select Student or Teacher...'
+                placeholder='Select Student or Teacher...', 
+                style={'marginBottom': '0.5rem', 'marginTop': '0'}
             ),
-            html.Br(),
             dcc.Dropdown(
                 id={'type': 'dynamic-input', 'index': 'select-item'}, 
-                placeholder='select item', 
+                placeholder='select item',
+                style={'marginBottom': '0.5rem', 'marginTop': '0'} 
             ),
-            html.Br(),
             # Upcoming Deadlines
             html.Div([
-                html.H5("Upcoming Deadlines"),
+                html.H6("Upcoming Deadlines"),
                 dash_table.DataTable(
                     id={'type': 'dynamic-output', 'index': 'deadlines-table'},
                     columns=[
@@ -380,20 +395,24 @@ task_tab = html.Div([
                         {'name': 'Block', 'id': 'Block'}
                     ],
                     data=upcoming_deadlines(), 
-                    style_cell={'textAlign':'center'}, 
-                    style_header={'fontWeight': 'bold'}, 
+                    style_cell={'textAlign':'center', 'fontSize':'0.7rem'}, 
+                    style_header={'fontWeight': 'bold', 'textAlign':'center'}, 
                 )
-            ], style={'border': 
+            ], 
+                style={'border': 
                       '2px solid #387c9f', 
                       'border-radius': '8px', 
                       'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                       'padding':'10px', 
-                      'minHeight': '57vh'})
-        ], style={'flex': '1', 'padding': '10px'}
+                      'minHeight': '60vh'
+                }
+            )
+        ], 
+            style={'flex': '1','fontSize': '0.8rem'}
         ),
              
         # COLUMN 2
-        html.Div([
+        dbc.Col([
             # Task Display Table
             html.Div([
                 html.Div(id={'type': 'dynamic-input', 'index': 'dynamic-task-tables'}),
@@ -408,7 +427,7 @@ task_tab = html.Div([
 
             # Task Deadlines - User input 
             html.Div([
-                html.H5("New Tasks", style={'marginBottom':'10px'}), 
+                html.H6("New Tasks", style={'marginBottom':'10px'}), 
                 # Table input
                 dag.AgGrid(
                     id={'type': 'user-input', 'index': 'deadlines-table'}, 
@@ -420,26 +439,28 @@ task_tab = html.Div([
                         {'headerName': 'Due', 'field': 'Due', 'editable': True, 'flex':1} 
                     ], 
                     rowData=initial_deadlines_data, 
-                    defaultColDef={"sortable": False, 
-                               "filter": False, 
-                               "resizable": False, 
+                    defaultColDef={'sortable': False, 
+                               'filter': False, 
+                               'resizable': False, 
                                'wrapHeaderText': True, 
-                               'suppressMovable': True },
+                               'suppressMovable': True,
+                               'cellStyle': {'fontSize': '0.7rem'}, 
+                               'autoHeaderHeight': True},
                     style={'width': '100%', 'height':'150px'} 
                 ),
 
                 # Button - add row/submit data
                 html.Div([
-                    dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px'}),
-                    dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0)
+                    # Output message
+                    html.Div(id={'index':'output-msg-deadlines','type':'dynamic-output'}, style={'marginRight':'10px', 'fontSize':'0.7rem'}), 
+                    dbc.Button("Add Row", id={'type': 'dynamic-input', 'index': 'add-row-deadlines'}, n_clicks=0, style={'marginRight':'10px', 'fontSize':'0.7rem'}),
+                    dbc.Button("Submit", id={'type': 'dynamic-input', 'index': 'submit-deadlines'}, n_clicks=0, style={'fontSize':'0.7rem'})
                 ], style={
                     'display': 'flex',
                     'justifyContent': 'flex-end',  
-                    'marginTop': '10px'} 
-                ),
-                # Output message
-                html.Div(id={'index':'output-msg-deadlines','type':'dynamic-output'}) 
-                      
+                    'marginTop': '10px', 
+                    'alignItems': 'center'} 
+                ),                     
             ], style={
                 'border': '2px solid #387c9f',
                 'border-radius': '8px', 
@@ -449,17 +470,18 @@ task_tab = html.Div([
                 'minHeight': '35vh'
             }),
 
-        ], style={
+        ], 
+        style={
             'flex': '3',  
             'display': 'flex',  
-            'flex-direction': 'column',  
-            'gap': '10px'
-        })
+            'flex-direction': 'column'
+        }
+        )
 
-    ], style={'display': 'flex', 'gap': '10px', 'align-items': 'flex-start', 'paddingTop':'25px'}
-    )
-
-])
+], 
+class_name='g-2',
+style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'0.5rem', 'width': '100%'}
+)
 
 # FOOTER
 footer_info = [
