@@ -318,8 +318,37 @@ def teacher_tasks(teacher):
         df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
 
+def student_tasks_update():
+    """Generates and updates student_tasks.csv to include newly entered deadlines. 
+    """
+    # load data
+    df_master = pd.read_csv(DEADLINES_DATA)
+    student_schedule = pd.read_csv(STUDENT_DATA)
+    
+    # create file 
+    if not os.path.isfile(STUDENT_TASKS):
+        columns = ['Student', 'Task', 'Course', 'Block', 'Teacher', 'Grade', 'Due', 'Completed', 'Hidden']
+        pd.DataFrame(columns=columns).to_csv(STUDENT_TASKS, index=False)
+    
+    df_student_tasks = pd.read_csv(STUDENT_TASKS) 
+    
+    # obtain new tasks to include    
+    match_cols=['Task', 'Course', 'Block', 'Teacher', 'Due']
+    merged = df_master.merge(df_student_tasks[match_cols].drop_duplicates(), on=match_cols, how='left', indicator=True)
+    new_tasks = merged[merged['_merge'] == 'left_only'].drop(columns='_merge')
+
+    # match with students and format
+    new_data = pd.merge(student_schedule, new_tasks, on=['Course', 'Teacher', 'Block'], how='inner')
+    new_data['Completed'] = False
+    new_data['Hidden'] = False
+    new_data = new_data[['Student', 'Task', 'Course', 'Block', 'Teacher', 'Grade', 'Due', 'Completed', 'Hidden']]
+
+    # save new data
+    new_data.to_csv(STUDENT_TASKS, mode='a', header=False, index=False)  
+
 def save_deadlines_data(data):
-    """Updates master_deadlines.csv to include user entered data.
+    """Updates master_deadlines.csv to include user entered data. Then calls student_task_updates() to 
+    update student_tasks.csv with newly entered tasks. 
     
     Parameters
     ----------
@@ -349,6 +378,10 @@ def save_deadlines_data(data):
     df_updated = pd.concat([current_data, df_clean], ignore_index=True)
     df_updated = df_updated.sort_values(by=['Due', 'Teacher'], ascending=[True, True])
     df_updated.to_csv(DEADLINES_DATA, index=False)
+    
+    # update student_tasks.csv
+    student_tasks_update()
+
     return "Data saved successfully."
 
 def save_deleted_changes(data, student_name):
