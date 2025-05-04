@@ -298,7 +298,7 @@ def workhabit_timeline(selected_student=None):
             fig.add_annotation(
                 x=nan_date,
                 y=len(habit_categories) - 0.5,  
-                text="Absent",
+                text="A",
                 showarrow=True,
                 ax=0,  
                 ay=-10,  

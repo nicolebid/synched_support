@@ -1,12 +1,10 @@
-import dash.html as html
-import dash.dcc as dcc
 import dash_bootstrap_components as dbc
 import datetime
 import pandas as pd 
 import dash_ag_grid as dag
 from collections import OrderedDict
-from dash import dash_table
-from .data import  student_list, upcoming_deadlines, save_workhabits_data
+from dash import dash_table, html, dcc
+from .data import  student_list, upcoming_deadlines, save_workhabits_data, teacher_list, course_list
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 
 # HEADER
@@ -83,10 +81,22 @@ initial_workhabit_data = [{'Student': '', 'Workhabit Score': '', 'Focus': '', 'S
 default_student_tasks = [{'Due': None, 'Task': None, 'Course': None, 'Teacher': None, 'Block': None }]
 initial_deadlines_data = [{'Task': '', 'Course': '', 'Block': '', 'Teacher': '', 'Due':''}]
 
+
+# User input options
+students_dict = student_list()
+students = [i['label'] for i in students_dict]
+
+teachers_dict = teacher_list()
+teachers = [i['label'] for i in teachers_dict]
+
+courses_dict = course_list()
+courses = [i['label'] for i in courses_dict]
+
 # Student Tab 
 student_tab = dbc.Row([
     # COLUMN 1
     dbc.Col([   
+    html.Div([
     # Student Selection
         dcc.Dropdown(
             id={'type': 'dynamic-input', 'index': 'student-select'},
@@ -94,7 +104,7 @@ student_tab = dbc.Row([
             value='A', 
             placeholder='Select a student...', 
             style={
-                'marginBottom': '0.5rem', 
+                'marginBottom': '0.25rem', 
                 'fontSize': '0.8rem'
             } 
         ),  
@@ -124,8 +134,6 @@ student_tab = dbc.Row([
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding':'10px', 
                 'marginBottom': '0.5rem', 
-                'flex-grow': '1',
-                'height': 'auto'
         }
         ),
         # Work habit Cards 
@@ -182,13 +190,14 @@ student_tab = dbc.Row([
                 'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)', 
                 'padding':'10px', 
                 'marginBottom': '0.8rem', 
-                'flex-grow': '1', 
         } 
         )
-
-    ], width=3,style={'display': 'flex','flex-direction': 'column'}), 
+    ], style={'display': 'flex', 'flexDirection': 'column', 'height': '100%'})
+    ], width=3,), 
+    
     # COLUMN 2 
     dbc.Col([
+    html.Div([
         # Workhabits Graphs 
         html.Div([
             html.Div([
@@ -259,10 +268,12 @@ student_tab = dbc.Row([
                 'height':'35.5vh' 
             } 
         )
-    ], width=5, style={'display': 'flex', 'flex-direction': 'column'}),
+    ], style={'display': 'flex', 'flexDirection': 'column', 'height': '100%'})
+    ], width=5),
 
     # COLUMN 3
     dbc.Col([
+    html.Div([
         # Attendance Bar Chart 
         html.Div([
             html.Div([
@@ -314,10 +325,14 @@ student_tab = dbc.Row([
             dag.AgGrid(
                 id={'type': 'user-input', 'index': 'workhabit-table'},
                 columnDefs=[
-                    {'headerName': 'Student', 'field': 'Student', 'editable': True, 'flex': 1},
-                    {'headerName': 'WH Score', 'field': 'Workhabit Score', 'editable': True, 'flex': 1},
-                    {'headerName': 'Subject Focus', 'field': 'Focus', 'editable': True, 'flex': 1},
-                    {'headerName': 'Attendance', 'field': 'Support Attendance', 'editable': True, 'flex': 1}
+                    {'headerName': 'Student', 'field': 'Student', 'editable': True, 
+                        'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": students }, 'flex': 1},
+                    {'headerName': 'WH Score', 'field': 'Workhabit Score', 'editable': True, 
+                        'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": ["0", "1", "2", "3", "4"]},  'flex': 1},
+                    {'headerName': 'Subject', 'field': 'Focus', 'editable': True, 
+                        'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": ["Art", "English", "French", "Math", "Science", "Socials", "Other"]}, 'flex': 1},
+                    {'headerName': 'Attendance', 'field': 'Support Attendance', 'editable': True, 
+                     'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": ["P", "L", "A", "AE"]},'flex': 1}
                 ],
                 rowData=initial_workhabit_data, 
                 defaultColDef={'sortable': False, 
@@ -326,9 +341,9 @@ student_tab = dbc.Row([
                                'wrapHeaderText': True, 
                                'suppressMovable': True, 
                                'cellStyle': {'fontSize': '0.7rem'},
-                               "autoHeaderHeight": True,
                 },
-                style={'width': '100%', 'height':'150px'}, 
+                style={'width': '100%', 'height':'127px'}, 
+                dashGridOptions={'headerHeight': 35, "rowHeight": 25 },
             ),
 
             # Button - add row/submit data
@@ -354,15 +369,19 @@ student_tab = dbc.Row([
                 'padding':'10px',
                 'overflow': 'visible'                             
             }                             
-        ),                           
-    ], 
-        width=4, style={'flex-direction': 'column'}
-    )
+        ),   
+
+    ], style={'display': 'flex', 'flexDirection': 'column', 'height': '100%'})                        
+    ], width=4, )
 ],
 class_name='g-2',
-style={'display': 'flex', 'justify-content': 'space-between', 'flex-wrap': 'wrap', 'paddingTop':'0.5rem', 'width': '100%'}
+style={
+        'display': 'flex',
+        'flexWrap': 'nowrap',
+        'padding': '0.5rem' ,
+        'flexGrow': 1, 
+        'overflowX': 'hidden'}
 )
-
 # Task Tab 
 task_tab = dbc.Row([
         # COLUMN 1 
@@ -433,10 +452,13 @@ task_tab = dbc.Row([
                     id={'type': 'user-input', 'index': 'deadlines-table'}, 
                     columnDefs=[
                         {'headerName': 'Task', 'field': 'Task', 'editable': True, 'flex':3},
-                        {'headerName': 'Course', 'field': 'Course', 'editable': True, 'flex':3},
-                        {'headerName': 'Block', 'field': 'Block', 'editable': True, 'flex':1},
-                        {'headerName': 'Teacher', 'field': 'Teacher', 'editable': True, 'flex':3},
-                        {'headerName': 'Due', 'field': 'Due', 'editable': True, 'flex':1} 
+                        {'headerName': 'Course', 'field': 'Course', 'editable': True, 
+                         'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": courses },'flex':3},
+                        {'headerName': 'Block', 'field': 'Block', 'editable': True, 
+                            'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": ['1-1', '1-2', '1-3','1-4','2-1', '2-2','2-3','2-4'] },'flex':1},
+                        {'headerName': 'Teacher', 'field': 'Teacher', 'editable': True, 
+                            'cellEditor':'agSelectCellEditor', "cellEditorParams": {"values": teachers },'flex':3},
+                        {'headerName': 'Due', 'field': 'Due', 'editable': True, "cellDataType": "dateString" ,'flex':1} 
                     ], 
                     rowData=initial_deadlines_data, 
                     defaultColDef={'sortable': False, 
@@ -445,8 +467,9 @@ task_tab = dbc.Row([
                                'wrapHeaderText': True, 
                                'suppressMovable': True,
                                'cellStyle': {'fontSize': '0.7rem'}, 
-                               'autoHeaderHeight': True},
-                    style={'width': '100%', 'height':'150px'} 
+                        },
+                    style={'width': '100%', 'height':'150px'},
+                    dashGridOptions={'headerHeight': 35, "rowHeight": 25, "stopEditingWhenCellsLoseFocus": True },
                 ),
 
                 # Button - add row/submit data

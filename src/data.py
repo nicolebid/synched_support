@@ -172,6 +172,10 @@ def save_workhabits_data(data, date):
     df_student = pd.read_csv(STUDENT_DATA)
     clean_data = []
     workhabit_scores = {'0':'Off-task', '1':'Mostly Off-task', '2':'Equally On/Off-task', '3':'Mostly On-task', '4':'On-task'}
+
+
+
+
     
     for data_pt in data:
 
@@ -333,9 +337,9 @@ def save_deadlines_data(data):
         
         # obtain values
         temp_pt['Task'] = data_pt['Task'].strip()
-        temp_pt['Course'] = data_pt['Course'].strip().capitalize()
+        temp_pt['Course'] = data_pt['Course'].strip()
         temp_pt['Block'] = data_pt['Block'].strip()
-        temp_pt['Teacher'] = data_pt['Teacher'].strip().capitalize()
+        temp_pt['Teacher'] = data_pt['Teacher'].strip()
         temp_pt['Due'] = data_pt['Due'].strip()
         clean_data.append(temp_pt)
 
