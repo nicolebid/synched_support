@@ -148,7 +148,7 @@ def register_callbacks(app):
     def update_table(add_clicks, submit_clicks, date, cell_changed, existing_data):
         ctx = dash.callback_context
         if not ctx.triggered:
-            return existing_data, ''
+            return existing_data, dash.no_update
 
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
@@ -307,7 +307,11 @@ def register_callbacks(app):
         prevent_initial_call=True
     )
     def update_deadlines_table(add_clicks, submit_clicks, cell_change, existing_data):
-        ctx = dash.callback_context
+        
+        ctx = dash.callback_context 
+        if not ctx.triggered:
+            return existing_data, dash.no_update
+        
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0] 
 
         # add row
