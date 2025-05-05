@@ -483,7 +483,8 @@ task_tab = dbc.Row([
                     'justifyContent': 'flex-end',  
                     'marginTop': '10px', 
                     'alignItems': 'center'} 
-                ),                     
+                ), 
+                dcc.Store(id={'index':'csv-write-flag','type':'dynamic-output'}, data=False)                    
             ], style={
                 'border': '2px solid #387c9f',
                 'border-radius': '8px', 
