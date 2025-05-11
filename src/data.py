@@ -295,7 +295,7 @@ def teacher_roster(teacher):
     df_pivot = df_teacher.pivot(columns='Course_block', values='Student')
     df_clean_dict = {}
     for col in df_pivot.columns:
-        df_clean_dict[col] = df_pivot[col].dropna().tolist()
+        df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
 
 def teacher_tasks(teacher):
