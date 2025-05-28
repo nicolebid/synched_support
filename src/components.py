@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-import datetime
+from datetime import datetime
 import pandas as pd 
 import dash_ag_grid as dag
 from collections import OrderedDict
@@ -314,7 +314,7 @@ student_tab = dbc.Row([
                 # Date 
                 dcc.DatePickerSingle(
                     id={'type':'dynamic-input', 'index':'date-picker'}, 
-                    placeholder="Select date", date=datetime.date.today(), 
+                    placeholder="Select date", date=datetime.today().date(), 
                     style={'marginBottom':'10px'}
                 )
             ], 

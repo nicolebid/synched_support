@@ -2,15 +2,23 @@ import dash
 from dash import ctx
 import dash.html as html
 import dash.dcc as dcc
-import datetime
+from datetime import datetime, timedelta
 import os
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, MATCH
 from dash import dash_table
 from .data import student_list, student_schedule, teacher_list, student_deadlines, teacher_roster, teacher_tasks, get_student_note, save_student_note, save_workhabits_data, save_deadlines_data, save_deleted_changes, save_checked_changes, workhabit_trend, upcoming_deadlines
 from .graphs import attendance_barchart, workhabit_timeline, timespent_barchart
 from dash import callback_context
 from .components import *
 from .config import * 
+
+# FIX 
+#start = datetime.today() - timedelta(weeks=70)
+# end = datetime.today() + timedelta(weeks=3)
+# start_str = start.strftime('%Y-%m-%d')
+# end_str = end.strftime('%Y-%m-%d')
+# dcc.Store(id={'type': 'dynamic-input', 'index': 'start-date'}, data=start_str), 
+# dcc.Store(id={'type': 'dynamic-input', 'index': 'end-date'}, data=end_str),
 
 def register_callbacks(app):
 
@@ -204,8 +212,10 @@ def register_callbacks(app):
         Output({'type': 'dynamic-input', 'index': 'dynamic-task-tables'}, 'children'), 
         [
             Input({'type': 'dynamic-input', 'index': 'select-type'}, 'value'), 
-            Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value')
-        ]
+            Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value'), 
+        ],
+        prevent_initial_call=True
+
     )
     def update_content_t2col2(role, name):
 
@@ -244,10 +254,31 @@ def register_callbacks(app):
             ])
 
         elif role == 'Teacher' and name: 
+
             teacher_roster_dict = teacher_roster(name)
-            teacher_task_dict = teacher_tasks(name)
+            start = datetime.today() - timedelta(weeks=70)
+            end = datetime.today() + timedelta(weeks=3)
+
+            start_str = start.strftime('%Y-%m-%d')
+            end_str = end.strftime('%Y-%m-%d')
+
+            teacher_task_dict = teacher_tasks(name, start_str, end_str)
             return html.Div([
-            html.H5(f'{name} - Assigned Tasks'), 
+                    html.Div([
+                        html.H6(f'{name} - Assigned Tasks'), 
+                        # Date 
+                        dcc.DatePickerRange(
+                            id={'type': 'dynamic-input', 'index': 'date-picker-tasks'},
+                            start_date_placeholder_text="Start date",
+                            end_date_placeholder_text="End date",
+                            start_date=start_str,
+                            end_date=end_str, 
+                            style={'marginBottom':'10px'}
+                        ),
+                    ], 
+                        style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'width': '100%'}  
+                    ), 
+            # Table
             dash_table.DataTable(
                 columns=[{'name': col, 'id': col} for col in teacher_roster_dict.keys()], 
                 data=[{col: '\n'.join(map(str, students)) for col, students in teacher_task_dict.items()},
@@ -267,6 +298,31 @@ def register_callbacks(app):
                     style_table={'height': '200px', 'width': '100%'},
                 )
             ])
+# FIX
+    # Adjust Teacher Assigned Task table when date range is changed
+    # @app.callback(
+    #     Output({'type': 'dynamic-input', 'index': 'teacher-task-table'}, 'data'),
+    #     [
+    #         Input({'type': 'dynamic-input', 'index': 'start-date'}, 'data'),
+    #         Input({'type': 'dynamic-input', 'index': 'end-date'}, 'data'),
+    #         Input({'type': 'dynamic-input', 'index': 'select-item'}, 'value'),  # Teacher selected
+    #     ],
+    #     prevent_initial_call=True
+    # )
+    # def update_teacher_task_table(start_date, end_date, teacher_name):
+    #     print('Triggered')
+    #     if not teacher_name or not start_date or not end_date:
+    #         return dash.no_update  # If no teacher or no dates, do not update
+
+    #     # Fetch and filter teacher task data based on the selected date range
+    #     teacher_task_dict = teacher_tasks(teacher_name, start_date, end_date)
+
+    #     # Format the teacher's task data to match the table structure
+    #     table_data = [{col: '\n'.join(map(str, students)) for col, students in teacher_task_dict.items()}]
+
+    #     return table_data
+
+        
     @app.callback(
         Output({'type': 'dynamic-output', 'index': 'output-student-task'}, 'children'),
         Input({'type': 'dynamic-input', 'index': 'save-student-tasks'}, 'n_clicks'),
@@ -290,7 +346,7 @@ def register_callbacks(app):
             selected_rows_data = [data[i] for i in selected_rows_ind]
             msg = save_checked_changes(selected_rows_data, student_name)
         return msg
-
+    
     # Task Deadlines - User input
     # Add row/submit data/append to csv/reset table
     @app.callback(
@@ -349,4 +405,6 @@ def register_callbacks(app):
         if flag:
             return upcoming_deadlines()
         return dash.no_update
+
+
     

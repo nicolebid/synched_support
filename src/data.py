@@ -1,5 +1,5 @@
 import pandas as pd
-import datetime
+from datetime import datetime, timedelta
 import math
 from .config import STUDENT_DATA, DEADLINES_DATA, STUDENT_NOTE, ATTEND_DATA, STUDENT_TASKS
 import os
@@ -245,9 +245,9 @@ def upcoming_deadlines():
     """
     df = pd.read_csv(DEADLINES_DATA)
     df['Due'] = pd.to_datetime(df['Due'])
-    today = datetime.datetime.today()
-    upcoming_weeks = today + datetime.timedelta(weeks=4)
-    df_upcoming = df[(df['Due'] >= today) & ((df['Due'] <= upcoming_weeks))].copy()
+    today = datetime.today().date()
+    upcoming_weeks = today + timedelta(weeks=4)
+    df_upcoming = df[(df['Due'].dt.date >= today) & ((df['Due'].dt.date <= upcoming_weeks))].copy()
     df_upcoming = df_upcoming.sort_values(by='Due')
     df_upcoming['Due'] = df_upcoming['Due'].dt.strftime('%b %d')  
     return df_upcoming.to_dict('records') 
@@ -256,6 +256,11 @@ def student_deadlines(student):
     """Retrieves the tasks in the deadlines CSV file for the given student, keeping hidden or selected
     rows consistent from previous session. 
     
+    Parameters
+    ----------
+    student: str
+        The name of the student.  
+
     Returns:
     -------- 
     format_dict : list
@@ -283,6 +288,11 @@ def student_deadlines(student):
 def teacher_roster(teacher):
     """Retrieves the students in each of the teachers classes. 
     
+    Parameters
+    ----------
+    teacher: str
+        The name of the teacher.     
+    
     Returns:
     -------- 
     list : A list of dictionaries containing the courses and student lists. 
@@ -298,22 +308,45 @@ def teacher_roster(teacher):
         df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
 
-def teacher_tasks(teacher):
-    """Retrieves the assignments/tests for each course the given teacher teaches. 
+def teacher_tasks(teacher, start_date, end_date):
+    """Retrieves the assignments/tests due within the specified time for each course the given teacher teaches. 
     
+    Parameters
+    ----------
+    teacher: str
+        The name of the teacher. 
+
+    start_date: str
+        The starting date for the time range. 
+
+    end_date: str
+        The ending date for the time range. 
+
     Returns:
     -------- 
     list : A list of dictionaries containing the courses as keys and a list of assignments/tests as items. 
     """
     df_deadlines = pd.read_csv(DEADLINES_DATA)
     df_student = pd.read_csv(STUDENT_DATA)
+
+    # convert to dates
+    df_deadlines['Due'] = pd.to_datetime(df_deadlines['Due'], errors='coerce').dt.date
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+
     df_merged = pd.merge(df_deadlines, df_student, on=['Course', 'Teacher', 'Block'])
+    
+    # filter by teacher & date
     df_teacher = df_merged[df_merged['Teacher'] == teacher].copy()
+    df_teacher = df_teacher[(df_teacher['Due'] >= start_date_obj) & (df_teacher['Due'] <= end_date_obj)]
+    
+    # format for table
     df_teacher['Due_display'] = pd.to_datetime(df_teacher['Due']).dt.strftime('%b %d')  
     df_teacher['Task_due'] = df_teacher['Task'].str.cat(df_teacher['Due_display'], sep=' - ')
     df_teacher['Course_block'] = df_teacher['Course'] + " (" + df_teacher['Block'] + ")"
     df_pivot = df_teacher.pivot(columns='Course_block', values='Task_due')    
     df_clean_dict = {}
+    
     for col in df_pivot.columns:
         df_clean_dict[col] = list(set(df_pivot[col].dropna()))
     return df_clean_dict
