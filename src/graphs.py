@@ -129,7 +129,6 @@ def attendance_barchart(selected_student=None, overall=True):
             ticktext=['0%', '20%', '40%', '60%', '80%', '100%'], 
         ),
         bargap=gap, 
-        height=300, 
         autosize=True,
         legend=dict(
             orientation='h', 
@@ -191,7 +190,6 @@ def attendance_barchart_none(selected_student=None):
             tickangle=0
         ),
         autosize=True, 
-        height=160,
         legend=dict(
             orientation='h', 
             yanchor='top', 
@@ -241,6 +239,24 @@ def workhabit_timeline(selected_student=None):
     habit_categories = ['Off-task', 'Mostly Off-task', 'Equally On/Off-task',  'Mostly On-task', 'On-task']
     attendance_filter['Habit'] = pd.Categorical(attendance_filter['Habit'], categories=habit_categories, ordered=True)
 
+    # Calculate the date range
+    date_range_start = attendance_filter['Date'].min()
+    date_range_end = attendance_filter['Date'].max()
+
+    # Compute the number of days in the selected range
+    total_days = (date_range_end - date_range_start).days
+
+    # Set dynamic dtick based on the range
+    if total_days <= 7: 
+        dticks = "D1"  
+    elif total_days <= 30:  
+        dticks = "W1"  
+    elif total_days <= 365:  
+        dticks = "M1" 
+    else:  
+        dticks = "Y1"  
+
+
     # plot
     fig = go.Figure()
     fig.add_trace(go.Scatter(
@@ -263,15 +279,17 @@ def workhabit_timeline(selected_student=None):
         yaxis_title=None,
         showlegend=False, 
         xaxis=dict(
-            dtick="D1", 
+            dtick=dticks, 
             tickformat="%b-%d",  
             ticks="inside",  
             showgrid=True, 
-            tickangle=45 
+            tickangle=45,
         ),
         margin=dict(l=10, r=10, t=20, b=10), 
-        template="plotly_white"
+        template="plotly_white",
+        dragmode='zoom'
     )
+
     if selected_student != None:
         # red line for each NaN value
         for nan_date in nan_dates:
@@ -280,7 +298,7 @@ def workhabit_timeline(selected_student=None):
             fig.add_annotation(
                 x=nan_date,
                 y=len(habit_categories) - 0.5,  
-                text="Absent",
+                text="A",
                 showarrow=True,
                 ax=0,  
                 ay=-10,  
